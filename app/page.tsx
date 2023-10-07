@@ -33,8 +33,13 @@ export type BlockData = {
   type: BlockType;
 };
 
-const getBlockIndexById = (blocks: BlockData[], id: string) => {
-  return blocks.findIndex((block) => block.id === id);
+type BlocksState = {
+  ids: BlockData["id"][];
+  entities: Record<BlockData["id"], BlockData>;
+};
+
+const getBlockIndexById = (blocks: BlockData["id"][], id: string) => {
+  return blocks.findIndex((blockId) => blockId === id);
 };
 
 export default function Home() {
@@ -48,20 +53,23 @@ export default function Home() {
   );
 
   const [activeId, setActiveId] = useState<BlockData["id"] | null>(null);
-  const [blocks, setBlocks] = useState<BlockData[]>([
-    {
-      id: "1",
-      type: BlockType.shortText,
+  const [blocks, setBlocks] = useState<BlocksState>({
+    ids: ["1", "2", "3"],
+    entities: {
+      "1": {
+        id: "1",
+        type: BlockType.shortText,
+      },
+      "2": {
+        id: "2",
+        type: BlockType.shortText,
+      },
+      "3": {
+        id: "3",
+        type: BlockType.shortText,
+      },
     },
-    {
-      id: "2",
-      type: BlockType.shortText,
-    },
-    {
-      id: "3",
-      type: BlockType.shortText,
-    },
-  ]);
+  });
 
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;
@@ -78,11 +86,18 @@ export default function Home() {
     const overId = over.id as string;
 
     if (activeId !== overId) {
-      setBlocks((items) => {
+      setBlocks((state) => {
+        const items = state.ids;
+
         const oldIndex = getBlockIndexById(items, activeId);
         const newIndex = getBlockIndexById(items, overId);
 
-        return arrayMove(items, oldIndex, newIndex);
+        const newIds = arrayMove(items, oldIndex, newIndex);
+
+        return {
+          ...state,
+          ids: newIds,
+        };
       });
     }
   }
@@ -107,15 +122,15 @@ export default function Home() {
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={blocks}
+            items={blocks.ids}
             strategy={verticalListSortingStrategy}
           >
-            {blocks.map((block) => (
-              <SortableItem key={block.id} id={block.id} />
+            {blocks.ids.map((blockId) => (
+              <SortableItem key={blockId} data={blocks.entities[blockId]} />
             ))}
           </SortableContext>
           <DragOverlay>
-            {activeId ? <BlockItem id={activeId} /> : null}
+            {activeId ? <BlockItem data={blocks.entities[activeId]} /> : null}
           </DragOverlay>
         </DndContext>
 

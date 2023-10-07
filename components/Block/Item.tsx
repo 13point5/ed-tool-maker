@@ -7,22 +7,24 @@ import { GripHorizontalIcon, PlusIcon } from "lucide-react";
 import { LegacyRef, forwardRef } from "react";
 
 type Props = {
-  id: BlockData["id"];
+  data: BlockData;
   style?: Object;
 };
 
 const Item = forwardRef(
-  ({ id, ...props }: Props, ref: LegacyRef<HTMLDivElement>) => {
+  ({ data, ...props }: Props, ref: LegacyRef<HTMLDivElement>) => {
+    const { id, type } = data;
+
     return (
       <div
-        className="hover:p-4 hover:pt-0 hover:pb-8 hover:bg-slate-100 rounded-md w-full relative flex flex-col items-center group"
         {...props}
+        className="hover:p-4 hover:pt-0 hover:pb-8 hover:bg-slate-100 rounded-md w-full relative flex flex-col items-center group cursor-default"
         ref={ref}
       >
         <Button
           variant="ghost"
           size="icon"
-          className="w-7 h-7 invisible group-hover:visible"
+          className="w-full h-7 invisible group-hover:visible cursor-move"
         >
           <GripHorizontalIcon className="h-5" />
         </Button>

@@ -6,10 +6,12 @@ import { BlockItem } from "./Item";
 import { BlockData } from "@/app/page";
 
 type Props = {
-  id: BlockData["id"];
+  data: BlockData;
 };
 
-export const SortableItem = ({ id }: Props) => {
+export const SortableItem = ({ data }: Props) => {
+  const { id } = data;
+
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 
@@ -24,7 +26,7 @@ export const SortableItem = ({ id }: Props) => {
       style={style}
       {...attributes}
       {...listeners}
-      id={id}
+      data={data}
     />
   );
 };
