@@ -12,8 +12,14 @@ type Props = {
 export const SortableItem = ({ data }: Props) => {
   const { id } = data;
 
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -25,7 +31,8 @@ export const SortableItem = ({ data }: Props) => {
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
+      setActivatorNodeRef={setActivatorNodeRef}
+      listeners={listeners}
       data={data}
     />
   );

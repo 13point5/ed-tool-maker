@@ -7,19 +7,27 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useBlocksStore } from "@/lib/blocksStore";
 import { EditIcon, GripHorizontalIcon, PlusIcon } from "lucide-react";
+import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 
 type Props = {
+  listeners?: SyntheticListenerMap | undefined;
+  setActivatorNodeRef?: (element: HTMLElement | null) => void;
   data: BlockData;
   style?: Object;
 };
 
 const Item = forwardRef(
-  ({ data, ...props }: Props, ref: LegacyRef<HTMLDivElement>) => {
-    const { type, label } = data;
+  (
+    { data, listeners, setActivatorNodeRef, ...props }: Props,
+    ref: LegacyRef<HTMLDivElement>
+  ) => {
+    const { type, label, id } = data;
 
     const { updateBlockLabel } = useBlocksStore();
 
     const [editingLabel, setEditingLabel] = useState(false);
+    console.log("id", id);
+    console.log("editingLabel", editingLabel);
 
     return (
       <div
@@ -31,6 +39,8 @@ const Item = forwardRef(
           variant="ghost"
           size="icon"
           className="w-full h-7 invisible group-hover:visible cursor-move"
+          ref={setActivatorNodeRef}
+          {...listeners}
         >
           <GripHorizontalIcon className="h-5" />
         </Button>
