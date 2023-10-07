@@ -87,7 +87,7 @@ export default function Home() {
     <main className="flex flex-col gap-4 p-4 items-center w-screen">
       <h1 className="text-3xl font-semibold tracking-tight">Ed Tool Maker</h1>
 
-      <div className="flex flex-col gap-4 w-[700px] border-red-200 mx-auto">
+      <div className="flex flex-col gap-0 w-[700px] border-red-200 mx-auto">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -108,11 +108,11 @@ export default function Home() {
             ) : null}
           </DragOverlay>
         </DndContext>
-
-        <Button className="w-full mt-10" color="primary">
-          Generate
-        </Button>
       </div>
+
+      <Button className="mt-6" color="primary">
+        Generate
+      </Button>
     </main>
   );
 }

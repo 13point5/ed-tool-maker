@@ -1,3 +1,4 @@
+import * as R from "ramda";
 import { create } from "zustand";
 import { arrayMove } from "@dnd-kit/sortable";
 
@@ -46,7 +47,7 @@ type BlocksStore = {
 
   // addBlock: (blockType: BlockType) => BlockData;
   // removeBlock: (id: BlockData["id"]) => void;
-  // updateBlockLabel: (id: BlockData["id"], label: string) => void;
+  updateBlockLabel: (params: { id: BlockData["id"]; label: string }) => void;
   moveBlock: (params: {
     activeId: BlockData["id"];
     overId: BlockData["id"];
@@ -74,13 +75,25 @@ export const useBlocksStore = create<BlocksStore>()((set, get) => ({
 
       const newIds = arrayMove(items, oldIndex, newIndex);
 
-      return {
-        ...state,
+      return R.mergeDeepRight(state, {
         data: {
-          ...state.data,
           ids: newIds,
         },
-      };
+      });
     });
+  },
+
+  updateBlockLabel: ({ id, label }) => {
+    set((state) =>
+      R.mergeDeepRight(state, {
+        data: {
+          entities: {
+            [id]: {
+              label,
+            },
+          },
+        },
+      })
+    );
   },
 }));
