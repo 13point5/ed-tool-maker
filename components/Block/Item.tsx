@@ -1,11 +1,12 @@
+import { useState, LegacyRef, forwardRef } from "react";
+
 import { BlockData, BlockType } from "@/app/page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useBlocksStore } from "@/lib/blocksStore";
-import { GripHorizontalIcon, PlusIcon } from "lucide-react";
-import { LegacyRef, forwardRef } from "react";
+import { EditIcon, GripHorizontalIcon, PlusIcon } from "lucide-react";
 
 type Props = {
   data: BlockData;
@@ -17,6 +18,8 @@ const Item = forwardRef(
     const { type, label } = data;
 
     const { updateBlockLabel } = useBlocksStore();
+
+    const [editingLabel, setEditingLabel] = useState(false);
 
     return (
       <div
@@ -33,7 +36,36 @@ const Item = forwardRef(
         </Button>
 
         <div className="space-y-2 w-full">
-          <Label className="my-0">{label}</Label>
+          <div className="flex gap-4 items-center">
+            <Label className="my-0">{label}</Label>
+
+            {!editingLabel && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-6 invisible group-hover:visible"
+                onClick={(e) => {
+                  console.log("sup");
+                  e.preventDefault();
+                  setEditingLabel(true);
+                }}
+              >
+                <EditIcon className="w-4 h-4" />
+              </Button>
+            )}
+
+            {editingLabel && (
+              <div className="flex gap-2 items-center">
+                <Button variant="secondary" size="sm">
+                  Save
+                </Button>
+
+                <Button variant="outline" size="sm">
+                  Cancel
+                </Button>
+              </div>
+            )}
+          </div>
 
           {type === BlockType.longText && <Textarea />}
           {type === BlockType.shortText && <Input />}
