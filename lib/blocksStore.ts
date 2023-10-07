@@ -1,6 +1,7 @@
 import * as R from "ramda";
 import { create } from "zustand";
 import { arrayMove } from "@dnd-kit/sortable";
+import { nanoid } from "nanoid";
 
 export enum BlockType {
   shortText = "shortText",
@@ -45,8 +46,10 @@ type BlocksStore = {
   activeBlockId: BlockData["id"] | null;
   setActiveBlockId: (id: BlockData["id"] | null) => void;
 
-  // addBlock: (blockType: BlockType) => BlockData;
-  // removeBlock: (id: BlockData["id"]) => void;
+  insertBlockBelow: (params: {
+    currentBlockId: BlockData["id"];
+    type: BlockType;
+  }) => void;
   updateBlockLabel: (params: { id: BlockData["id"]; label: string }) => void;
   moveBlock: (params: {
     activeId: BlockData["id"];
@@ -64,6 +67,29 @@ export const useBlocksStore = create<BlocksStore>()((set, get) => ({
   activeBlockId: null,
   setActiveBlockId: (id) => {
     set({ activeBlockId: id });
+  },
+
+  insertBlockBelow: ({ currentBlockId, type }) => {
+    set((state) => {
+      const newBlockData: BlockData = {
+        id: nanoid(),
+        type,
+        label: "Untitled",
+      };
+
+      return R.mergeDeepRight(state, {
+        data: {
+          ids: R.insert(
+            getBlockIndexById(state.data.ids, currentBlockId) + 1,
+            newBlockData.id,
+            state.data.ids
+          ),
+          entities: {
+            [newBlockData.id]: newBlockData,
+          },
+        },
+      });
+    });
   },
 
   moveBlock: ({ activeId, overId }) => {

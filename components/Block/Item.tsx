@@ -23,7 +23,7 @@ const Item = forwardRef(
   ) => {
     const { type, label, id } = data;
 
-    const { updateBlockLabel } = useBlocksStore();
+    const { updateBlockLabel, insertBlockBelow } = useBlocksStore();
 
     const [editingLabel, setEditingLabel] = useState(false);
     const [tempLabel, setTempLabel] = useState(label);
@@ -46,6 +46,14 @@ const Item = forwardRef(
     const handleCancel = () => {
       setTempLabel(label);
       setEditingLabel(false);
+    };
+
+    const handleAddShortInput = () => {
+      insertBlockBelow({ currentBlockId: id, type: BlockType.shortText });
+    };
+
+    const handleAddLongInput = () => {
+      insertBlockBelow({ currentBlockId: id, type: BlockType.longText });
     };
 
     return (
@@ -116,11 +124,11 @@ const Item = forwardRef(
         </div>
 
         <div className="flex gap-4 items-center justify-center absolute -bottom-4 inset-x-0 invisible group-hover:visible">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleAddShortInput}>
             <PlusIcon className="mr-2 h-4 w-4" /> Short Input
           </Button>
 
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleAddLongInput}>
             <PlusIcon className="mr-2 h-4 w-4" /> Long Input
           </Button>
         </div>
