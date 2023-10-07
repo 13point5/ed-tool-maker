@@ -1,4 +1,4 @@
-import { BlockData } from "@/app/page";
+import { BlockData, BlockType } from "@/app/page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,7 @@ type Props = {
 
 const Item = forwardRef(
   ({ data, ...props }: Props, ref: LegacyRef<HTMLDivElement>) => {
-    const { id, type } = data;
+    const { type, label } = data;
 
     return (
       <div
@@ -30,8 +30,10 @@ const Item = forwardRef(
         </Button>
 
         <div className="space-y-2 w-full">
-          <Label className="my-0">Prompt {id}</Label>
-          <Textarea />
+          <Label className="my-0">{label}</Label>
+
+          {type === BlockType.longText && <Textarea />}
+          {type === BlockType.shortText && <Input />}
         </div>
 
         <div className="flex gap-4 items-center justify-center absolute -bottom-4 inset-x-0 invisible group-hover:visible">

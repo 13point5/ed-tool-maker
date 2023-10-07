@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { SortableItem } from "@/components/Block/SortableItem";
 import { BlockItem } from "@/components/Block/Item";
 
-enum BlockType {
+export enum BlockType {
   shortText = "shortText",
   longText = "longText",
 }
@@ -31,6 +31,7 @@ enum BlockType {
 export type BlockData = {
   id: string;
   type: BlockType;
+  label: string;
 };
 
 type BlocksState = {
@@ -59,17 +60,35 @@ export default function Home() {
       "1": {
         id: "1",
         type: BlockType.shortText,
+        label: "Short Input 1",
       },
       "2": {
         id: "2",
-        type: BlockType.shortText,
+        type: BlockType.longText,
+        label: "Long Input 1",
       },
       "3": {
         id: "3",
         type: BlockType.shortText,
+        label: "Short Input 2",
       },
     },
   });
+
+  const handleUpdateBlockLabel = (id: string, label: string) => {
+    setBlocks((state) => {
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [id]: {
+            ...state.entities[id],
+            label,
+          },
+        },
+      };
+    });
+  };
 
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;
