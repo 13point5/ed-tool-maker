@@ -26,8 +26,27 @@ const Item = forwardRef(
     const { updateBlockLabel } = useBlocksStore();
 
     const [editingLabel, setEditingLabel] = useState(false);
-    console.log("id", id);
-    console.log("editingLabel", editingLabel);
+    const [tempLabel, setTempLabel] = useState(label);
+
+    const handleEdit = () => {
+      setEditingLabel(true);
+    };
+
+    const handleTempLabelChange: React.ChangeEventHandler<HTMLInputElement> = (
+      e
+    ) => {
+      setTempLabel(e.target.value);
+    };
+
+    const handleSave = () => {
+      updateBlockLabel({ id, label: tempLabel });
+      setEditingLabel(false);
+    };
+
+    const handleCancel = () => {
+      setTempLabel(label);
+      setEditingLabel(false);
+    };
 
     return (
       <div
@@ -47,33 +66,48 @@ const Item = forwardRef(
 
         <div className="space-y-2 w-full">
           <div className="flex gap-4 items-center">
-            <Label className="my-0">{label}</Label>
-
             {!editingLabel && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-6 invisible group-hover:visible"
-                onClick={(e) => {
-                  console.log("sup");
-                  e.preventDefault();
-                  setEditingLabel(true);
-                }}
-              >
-                <EditIcon className="w-4 h-4" />
-              </Button>
+              <>
+                <Label className="my-0">{label}</Label>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-6 invisible group-hover:visible"
+                  onClick={handleEdit}
+                >
+                  <EditIcon className="w-4 h-4" />
+                </Button>
+              </>
             )}
 
             {editingLabel && (
-              <div className="flex gap-2 items-center">
-                <Button variant="secondary" size="sm">
-                  Save
-                </Button>
+              <>
+                <Input
+                  className="bg-transparent w-full h-8"
+                  defaultValue={tempLabel}
+                  onChange={handleTempLabelChange}
+                />
 
-                <Button variant="outline" size="sm">
-                  Cancel
-                </Button>
-              </div>
+                <div className="flex gap-2 items-center">
+                  <Button
+                    size="xs"
+                    className="bg-blue-500 hover:bg-blue-700 h-8"
+                    onClick={handleSave}
+                  >
+                    Save
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    className="text-red-500 hover:text-red-500 h-8"
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </>
             )}
           </div>
 
