@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { SortableItem } from "@/components/Block/SortableItem";
 import { BlockItem } from "@/components/Block/Item";
+import { useBlocksStore } from "@/lib/blocksStore";
 
 export enum BlockType {
   shortText = "shortText",
@@ -53,47 +54,12 @@ export default function Home() {
     })
   );
 
-  const [activeId, setActiveId] = useState<BlockData["id"] | null>(null);
-  const [blocks, setBlocks] = useState<BlocksState>({
-    ids: ["1", "2", "3"],
-    entities: {
-      "1": {
-        id: "1",
-        type: BlockType.shortText,
-        label: "Short Input 1",
-      },
-      "2": {
-        id: "2",
-        type: BlockType.longText,
-        label: "Long Input 1",
-      },
-      "3": {
-        id: "3",
-        type: BlockType.shortText,
-        label: "Short Input 2",
-      },
-    },
-  });
-
-  const handleUpdateBlockLabel = (id: string, label: string) => {
-    setBlocks((state) => {
-      return {
-        ...state,
-        entities: {
-          ...state.entities,
-          [id]: {
-            ...state.entities[id],
-            label,
-          },
-        },
-      };
-    });
-  };
+  const { activeBlockId, setActiveBlockId, data, moveBlock } = useBlocksStore();
 
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;
 
-    setActiveId(active.id as string);
+    setActiveBlockId(active.id as string);
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -105,19 +71,7 @@ export default function Home() {
     const overId = over.id as string;
 
     if (activeId !== overId) {
-      setBlocks((state) => {
-        const items = state.ids;
-
-        const oldIndex = getBlockIndexById(items, activeId);
-        const newIndex = getBlockIndexById(items, overId);
-
-        const newIds = arrayMove(items, oldIndex, newIndex);
-
-        return {
-          ...state,
-          ids: newIds,
-        };
-      });
+      moveBlock({ activeId, overId });
     }
   }
 
@@ -141,15 +95,17 @@ export default function Home() {
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={blocks.ids}
+            items={data.ids}
             strategy={verticalListSortingStrategy}
           >
-            {blocks.ids.map((blockId) => (
-              <SortableItem key={blockId} data={blocks.entities[blockId]} />
+            {data.ids.map((blockId) => (
+              <SortableItem key={blockId} data={data.entities[blockId]} />
             ))}
           </SortableContext>
           <DragOverlay>
-            {activeId ? <BlockItem data={blocks.entities[activeId]} /> : null}
+            {activeBlockId ? (
+              <BlockItem data={data.entities[activeBlockId]} />
+            ) : null}
           </DragOverlay>
         </DndContext>
 
