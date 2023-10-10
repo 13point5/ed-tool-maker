@@ -55,6 +55,7 @@ type BlocksStore = {
     activeId: BlockData["id"];
     overId: BlockData["id"];
   }) => void;
+  deleteBlock: (id: BlockData["id"]) => void;
 };
 
 const getBlockIndexById = (blocks: BlockData["id"][], id: string) => {
@@ -121,5 +122,19 @@ export const useBlocksStore = create<BlocksStore>()((set, get) => ({
         },
       })
     );
+  },
+
+  deleteBlock: (id) => {
+    set((state) => {
+      const newIds = state.data.ids.filter((blockId) => blockId !== id);
+      const newEntities = R.omit([id], state.data.entities);
+
+      return R.mergeDeepRight(state, {
+        data: {
+          ids: newIds,
+          entities: newEntities,
+        },
+      });
+    });
   },
 }));

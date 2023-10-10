@@ -6,7 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useBlocksStore } from "@/lib/blocksStore";
-import { EditIcon, GripHorizontalIcon, PlusIcon } from "lucide-react";
+import {
+  EditIcon,
+  GripHorizontalIcon,
+  PlusIcon,
+  TrashIcon,
+} from "lucide-react";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 
 type Props = {
@@ -23,7 +28,8 @@ const Item = forwardRef(
   ) => {
     const { type, label, id } = data;
 
-    const { updateBlockLabel, insertBlockBelow } = useBlocksStore();
+    const { updateBlockLabel, insertBlockBelow, deleteBlock } =
+      useBlocksStore();
 
     const [editingLabel, setEditingLabel] = useState(false);
     const [tempLabel, setTempLabel] = useState(label);
@@ -56,6 +62,10 @@ const Item = forwardRef(
       insertBlockBelow({ currentBlockId: id, type: BlockType.longText });
     };
 
+    const handleDelete = () => {
+      deleteBlock(id);
+    };
+
     return (
       <div
         {...props}
@@ -78,14 +88,25 @@ const Item = forwardRef(
               <>
                 <Label className="my-0">{label}</Label>
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-6 invisible group-hover:visible"
-                  onClick={handleEdit}
-                >
-                  <EditIcon className="w-4 h-4" />
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-5 invisible group-hover:visible"
+                    onClick={handleEdit}
+                  >
+                    <EditIcon className="w-4 h-4" />
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-5 invisible group-hover:visible"
+                    onClick={handleDelete}
+                  >
+                    <TrashIcon className="w-4 h-4" />
+                  </Button>
+                </div>
               </>
             )}
 
