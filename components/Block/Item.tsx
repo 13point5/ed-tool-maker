@@ -1,6 +1,6 @@
 import { useState, LegacyRef, forwardRef } from "react";
 
-import { BlockData, BlockType } from "@/app/page";
+import { BlockData, BlockType } from "@/lib/blocksStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

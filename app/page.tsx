@@ -24,26 +24,6 @@ import { SortableItem } from "@/components/Block/SortableItem";
 import { BlockItem } from "@/components/Block/Item";
 import { useBlocksStore } from "@/lib/blocksStore";
 
-export enum BlockType {
-  shortText = "shortText",
-  longText = "longText",
-}
-
-export type BlockData = {
-  id: string;
-  type: BlockType;
-  label: string;
-};
-
-type BlocksState = {
-  ids: BlockData["id"][];
-  entities: Record<BlockData["id"], BlockData>;
-};
-
-const getBlockIndexById = (blocks: BlockData["id"][], id: string) => {
-  return blocks.findIndex((blockId) => blockId === id);
-};
-
 export default function Home() {
   const [prompt, setPrompt] = useState("");
 

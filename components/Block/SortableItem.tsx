@@ -3,7 +3,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 import { BlockItem } from "./Item";
-import { BlockData } from "@/app/page";
+import { BlockData } from "@/lib/blocksStore";
 
 type Props = {
   data: BlockData;
