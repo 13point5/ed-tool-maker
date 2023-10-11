@@ -20,7 +20,7 @@ type BlocksState = {
 };
 
 const initialState: BlocksState = {
-  ids: ["1", "2", "3", "4", "5"],
+  ids: ["1", "2", "3", "4", "5", "6"],
   entities: {
     "1": {
       id: "1",
@@ -44,6 +44,11 @@ const initialState: BlocksState = {
     },
     "5": {
       id: "5",
+      type: BlockType.shortText,
+      label: "Short Input 4",
+    },
+    "6": {
+      id: "6",
       type: BlockType.shortText,
       label: "Short Input 4",
     },

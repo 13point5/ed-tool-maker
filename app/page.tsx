@@ -77,7 +77,7 @@ export default function Home() {
   };
 
   return (
-    <main className="w-screen h-screen flex flex-col">
+    <main className="w-screen min-h-screen flex flex-col">
       <Header />
 
       <div className="space-y-4 p-4">

@@ -76,73 +76,75 @@ export default function Home() {
   };
 
   return (
-    <main className="w-screen h-screen grid grid-cols-12">
+    <main className="w-screen min-h-screen flex flex-col">
       <Header />
 
-      <div className="col-start-1 col-end-8 overflow-auto flex flex-col gap-8 items-center border-r-2 p-4">
-        <div className="flex flex-col gap-0 grow w-full">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={data.ids}
-              strategy={verticalListSortingStrategy}
+      <div className="grow flex gap-0">
+        <div className="grow flex flex-col gap-8 items-center border-r-2 p-4">
+          <div className="flex flex-col gap-0 grow w-full">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
             >
-              {data.ids.map((blockId) => (
-                <SortableItem key={blockId} data={data.entities[blockId]} />
-              ))}
-            </SortableContext>
-            <DragOverlay>
-              {activeBlockId ? (
-                <BlockItem data={data.entities[activeBlockId]} />
-              ) : null}
-            </DragOverlay>
-          </DndContext>
+              <SortableContext
+                items={data.ids}
+                strategy={verticalListSortingStrategy}
+              >
+                {data.ids.map((blockId) => (
+                  <SortableItem key={blockId} data={data.entities[blockId]} />
+                ))}
+              </SortableContext>
+              <DragOverlay>
+                {activeBlockId ? (
+                  <BlockItem data={data.entities[activeBlockId]} />
+                ) : null}
+              </DragOverlay>
+            </DndContext>
+          </div>
+
+          <Button className="w-full bg-blue-500 hover:bg-blue-700">Test</Button>
         </div>
 
-        <Button className="w-full bg-blue-500 hover:bg-blue-700">Test</Button>
-      </div>
+        <div className="flex flex-col gap-4 p-4 min-w-[400px]">
+          <h4 className="text-lg font-semibold">Tool Design</h4>
 
-      <div className="col-start-8 col-end-13 overflow-auto flex flex-col gap-4 p-4 w-full">
-        <h4 className="text-lg font-semibold">Tool Design</h4>
+          <div className="space-y-2">
+            <Label>Name</Label>
+            <Input />
+          </div>
 
-        <div className="space-y-2">
-          <Label>Name</Label>
-          <Input />
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <Input />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Instructions</Label>
+            <Textarea />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Model</Label>
+            <Select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Choose Model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">GPT 3.5</SelectItem>
+                <SelectItem value="dark">GPT 4</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button
+            className="w-full bg-blue-500 hover:bg-blue-700"
+            color="primary"
+          >
+            Save
+          </Button>
         </div>
-
-        <div className="space-y-2">
-          <Label>Description</Label>
-          <Input />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Instructions</Label>
-          <Textarea />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Model</Label>
-          <Select>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Choose Model" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="light">GPT 3.5</SelectItem>
-              <SelectItem value="dark">GPT 4</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <Button
-          className="w-full bg-blue-500 hover:bg-blue-700"
-          color="primary"
-        >
-          Save
-        </Button>
       </div>
     </main>
   );
