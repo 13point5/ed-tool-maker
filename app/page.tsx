@@ -13,7 +13,6 @@ import {
   DragEndEvent,
 } from "@dnd-kit/core";
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
@@ -23,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { SortableItem } from "@/components/Block/SortableItem";
 import { BlockItem } from "@/components/Block/Item";
 import { useBlocksStore } from "@/lib/blocksStore";
+import { UserMenu } from "@/components/UserMenu";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -64,10 +64,20 @@ export default function Home() {
   };
 
   return (
-    <main className="flex flex-col gap-4 p-4 items-center w-screen">
-      <h1 className="text-3xl font-semibold tracking-tight">Ed Tool Maker</h1>
+    <main className="flex flex-col gap-4 items-center w-screen">
+      <div className="border-b-2 p-4 flex gap-4 items-center justify-between w-full">
+        <div className="flex gap-4 items-center">
+          <h2 className="text-xl font-bold">ETM</h2>
 
-      <div className="flex flex-col gap-0 w-[700px] border-red-200 mx-auto">
+          <div className="text-slate-300">|</div>
+
+          <h3 className="text-lg font-semibold">GPT-3</h3>
+        </div>
+
+        <UserMenu />
+      </div>
+
+      <div className="flex flex-col gap-0 w-full">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
