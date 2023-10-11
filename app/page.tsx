@@ -34,6 +34,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Header from "@/components/Header";
+import { ToolPreviewCard } from "@/components/ToolPreviewCard";
+import { PlusIcon } from "lucide-react";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -75,8 +77,25 @@ export default function Home() {
   };
 
   return (
-    <main className="w-screen h-screen grid grid-cols-12">
+    <main className="w-screen h-screen flex flex-col">
       <Header />
+
+      <div className="space-y-4 p-4">
+        <div className="flex gap-4 items-center">
+          <h2 className="text-xl font-bold">Tools</h2>
+
+          <Button size="sm" className="bg-blue-500 hover:bg-blue-700">
+            <PlusIcon className="mr-1 w-5 h-5" /> Create Tool
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from(Array(10).keys()).map((i) => (
+            <ToolPreviewCard key={i} />
+          ))}
+          d
+        </div>
+      </div>
     </main>
   );
 }
