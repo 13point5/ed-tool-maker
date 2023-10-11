@@ -24,6 +24,15 @@ import { BlockItem } from "@/components/Block/Item";
 import { useBlocksStore } from "@/lib/blocksStore";
 import { UserMenu } from "@/components/UserMenu";
 import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -78,7 +87,7 @@ export default function Home() {
         <UserMenu />
       </div>
 
-      <div className="col-span-8 overflow-auto flex flex-col gap-6 items-center border-r-2 p-4">
+      <div className="col-span-8 overflow-auto flex flex-col gap-8 items-center border-r-2 p-4">
         <div className="flex flex-col gap-0 grow w-full">
           <DndContext
             sensors={sensors}
@@ -102,13 +111,38 @@ export default function Home() {
           </DndContext>
         </div>
 
-        <Button className="" color="primary">
+        <Button className="w-full bg-blue-500 hover:bg-blue-700">
           Generate
         </Button>
       </div>
 
       <div className="col-auto overflow-auto flex flex-col gap-4 p-4 min-w-[500px]">
         <h4 className="text-lg font-semibold">Tool Design</h4>
+
+        <div className="space-y-2">
+          <Label>Instructions</Label>
+          <Textarea />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Model</Label>
+          <Select>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Choose Model" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="light">GPT 3.5</SelectItem>
+              <SelectItem value="dark">GPT 4</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Button
+          className="w-full bg-blue-500 hover:bg-blue-700"
+          color="primary"
+        >
+          Save
+        </Button>
       </div>
     </main>
   );

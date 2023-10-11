@@ -92,7 +92,7 @@ const Item = forwardRef(
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="w-5 invisible group-hover:visible"
+                    className="w-5 h-5 invisible group-hover:visible"
                     onClick={handleEdit}
                   >
                     <EditIcon className="w-4 h-4" />
@@ -101,7 +101,7 @@ const Item = forwardRef(
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="w-5 invisible group-hover:visible"
+                    className="w-5 h-5 invisible group-hover:visible"
                     onClick={handleDelete}
                   >
                     <TrashIcon className="w-4 h-4" />
