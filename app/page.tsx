@@ -23,6 +23,7 @@ import { SortableItem } from "@/components/Block/SortableItem";
 import { BlockItem } from "@/components/Block/Item";
 import { useBlocksStore } from "@/lib/blocksStore";
 import { UserMenu } from "@/components/UserMenu";
+import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -64,7 +65,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex flex-col gap-4 items-center w-screen">
+    <main className="flex flex-col items-center w-screen h-screen">
       <div className="border-b-2 p-4 flex gap-4 items-center justify-between w-full">
         <div className="flex gap-4 items-center">
           <h2 className="text-xl font-bold">ETM</h2>
@@ -77,32 +78,40 @@ export default function Home() {
         <UserMenu />
       </div>
 
-      <div className="flex flex-col gap-0 w-full">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={data.ids}
-            strategy={verticalListSortingStrategy}
-          >
-            {data.ids.map((blockId) => (
-              <SortableItem key={blockId} data={data.entities[blockId]} />
-            ))}
-          </SortableContext>
-          <DragOverlay>
-            {activeBlockId ? (
-              <BlockItem data={data.entities[activeBlockId]} />
-            ) : null}
-          </DragOverlay>
-        </DndContext>
-      </div>
+      <div className="w-full h-full flex gap-4">
+        <div className="min-w-[500px] grow flex flex-col gap-6 items-center border-r-2 p-4 h-full overflow-y-auto overscroll-contain">
+          <div className="flex flex-col gap-0 grow w-full">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={data.ids}
+                strategy={verticalListSortingStrategy}
+              >
+                {data.ids.map((blockId) => (
+                  <SortableItem key={blockId} data={data.entities[blockId]} />
+                ))}
+              </SortableContext>
+              <DragOverlay>
+                {activeBlockId ? (
+                  <BlockItem data={data.entities[activeBlockId]} />
+                ) : null}
+              </DragOverlay>
+            </DndContext>
+          </div>
 
-      <Button className="mt-6" color="primary">
-        Generate
-      </Button>
+          <Button className="" color="primary">
+            Generate
+          </Button>
+        </div>
+
+        <div className="flex flex-col gap-4 p-4 min-w-[500px]">
+          <h4 className="text-lg font-semibold">Tool Design</h4>
+        </div>
+      </div>
     </main>
   );
 }
