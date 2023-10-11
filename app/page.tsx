@@ -87,7 +87,7 @@ export default function Home() {
         <UserMenu />
       </div>
 
-      <div className="col-span-8 overflow-auto flex flex-col gap-8 items-center border-r-2 p-4">
+      <div className="col-start-1 col-end-8 overflow-auto flex flex-col gap-8 items-center border-r-2 p-4">
         <div className="flex flex-col gap-0 grow w-full">
           <DndContext
             sensors={sensors}
@@ -116,7 +116,7 @@ export default function Home() {
         </Button>
       </div>
 
-      <div className="col-auto overflow-auto flex flex-col gap-4 p-4 min-w-[500px]">
+      <div className="col-start-8 col-end-13 overflow-auto flex flex-col gap-4 p-4 w-full">
         <h4 className="text-lg font-semibold">Tool Design</h4>
 
         <div className="space-y-2">
