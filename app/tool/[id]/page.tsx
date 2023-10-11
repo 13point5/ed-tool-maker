@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Header from "@/components/Header";
+import { Input } from "@/components/ui/input";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -102,13 +103,21 @@ export default function Home() {
           </DndContext>
         </div>
 
-        <Button className="w-full bg-blue-500 hover:bg-blue-700">
-          Generate
-        </Button>
+        <Button className="w-full bg-blue-500 hover:bg-blue-700">Test</Button>
       </div>
 
       <div className="col-start-8 col-end-13 overflow-auto flex flex-col gap-4 p-4 w-full">
         <h4 className="text-lg font-semibold">Tool Design</h4>
+
+        <div className="space-y-2">
+          <Label>Name</Label>
+          <Input />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Description</Label>
+          <Input />
+        </div>
 
         <div className="space-y-2">
           <Label>Instructions</Label>
