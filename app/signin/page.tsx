@@ -31,7 +31,7 @@ const formSchema = z.object({
   password: z.string(),
 });
 
-const SignUpPage = () => {
+const SignInPage = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,7 +51,7 @@ const SignUpPage = () => {
       <h1 className="text-4xl font-bold">ETM</h1>
       <Card className="max-w-sm w-full">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Create an account</CardTitle>
+          <CardTitle className="text-2xl">Sign In</CardTitle>
         </CardHeader>
 
         <Form {...form}>
@@ -86,15 +86,15 @@ const SignUpPage = () => {
               />
 
               <Button type="submit" className="w-full">
-                Submit
+                Sign In
               </Button>
             </CardContent>
 
             <CardFooter>
               <p className="text-sm text-muted-foreground">
-                Already have an account?{" "}
-                <Link href="/signin" className="underline">
-                  Sign In
+                Don&apos;t have an account?{" "}
+                <Link href="/signup" className="underline">
+                  Sign Up
                 </Link>
               </p>
             </CardFooter>
@@ -105,4 +105,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage;
+export default SignInPage;
