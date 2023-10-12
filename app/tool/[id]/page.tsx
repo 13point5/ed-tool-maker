@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
+import { ExternalLinkIcon, SaveIcon } from "lucide-react";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -138,11 +139,17 @@ export default function Home() {
             </Select>
           </div>
 
+          <Button className="w-full" variant="outline">
+            <SaveIcon className="mr-2 w-4 h-4" />
+            Save
+          </Button>
+
           <Button
             className="w-full bg-blue-500 hover:bg-blue-700"
             color="primary"
           >
-            Save
+            <ExternalLinkIcon className="mr-2 w-4 h-4" />
+            Publish
           </Button>
         </div>
       </div>
