@@ -1,10 +1,11 @@
-import Dashboard from "@/app/dashboard/dashboard";
+import Dashboard from "@/app/dashboard/components/dashboard";
+import { Database } from "@/app/database.types";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 const DashboardPage = async () => {
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = createServerComponentClient<Database>({ cookies });
 
   const {
     data: { user },
@@ -14,7 +15,10 @@ const DashboardPage = async () => {
     redirect("/");
   }
 
-  return <Dashboard />;
+  const data = await supabase.from("tools").select("*");
+  console.log("data", data);
+
+  return <Dashboard tools={data.data || []} />;
 };
 
 export default DashboardPage;
