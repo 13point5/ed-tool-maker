@@ -12,7 +12,7 @@ import Link from "next/link";
 
 export const ToolPreviewCard = () => {
   return (
-    <Link href="/tool/1">
+    <Link href="/tool-builder/1">
       <Card className="col=span-1">
         <CardHeader className="p-4">
           <div className="flex gap-6 items-center justify-between">

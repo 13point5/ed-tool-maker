@@ -1,20 +1,20 @@
-import SignUpForm from "./form";
+import Dashboard from "@/app/dashboard/dashboard";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-const SignUpPage = async () => {
+const DashboardPage = async () => {
   const supabase = createServerComponentClient({ cookies });
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user) {
-    redirect("/dashboard");
+  if (!user) {
+    redirect("/");
   }
 
-  return <SignUpForm />;
+  return <Dashboard />;
 };
 
-export default SignUpPage;
+export default DashboardPage;
