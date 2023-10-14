@@ -26,46 +26,57 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { SignInFooter } from "@/components/AuthFormFooters";
+import { useState } from "react";
+import { Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  email: z.string(),
   password: z.string(),
 });
 
-const SignUpForm = () => {
+enum FormStatus {
+  Idle,
+  Loading,
+  Error,
+  Success,
+}
+
+const UpdatePasswordForm = () => {
   const supabase = createClientComponentClient();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
       password: "",
     },
   });
 
+  // state for signin progress, error, and success
+  const [formStatus, setFormStatus] = useState<FormStatus>(FormStatus.Idle);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { error } = await supabase.auth.signUp({
-      email: values.email,
+    setFormStatus(FormStatus.Loading);
+
+    const { error } = await supabase.auth.updateUser({
       password: values.password,
-      options: {
-        emailRedirectTo: `${location.origin}/api/auth/callback`,
-      },
     });
 
     if (error) {
       console.error(error);
+      setFormStatus(FormStatus.Error);
       toast.error(error.message, {
         position: "bottom-center",
       });
-
       return;
     }
 
-    toast.success("Check your email for the confirmation link", {
+    setFormStatus(FormStatus.Success);
+    toast.success("Updated your password!", {
       position: "bottom-center",
     });
+    router.push("/dashboard");
   };
 
   return (
@@ -73,7 +84,7 @@ const SignUpForm = () => {
       <h1 className="text-4xl font-bold">ETM</h1>
       <Card className="max-w-sm w-full">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Create an account</CardTitle>
+          <CardTitle className="text-2xl">Update Password</CardTitle>
         </CardHeader>
 
         <Form {...form}>
@@ -81,24 +92,10 @@ const SignUpForm = () => {
             <CardContent className="grid gap-6">
               <FormField
                 control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="you@email.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>New Password</FormLabel>
                     <FormControl>
                       <Input type="password" {...field} />
                     </FormControl>
@@ -108,13 +105,15 @@ const SignUpForm = () => {
               />
 
               <Button type="submit" className="w-full">
-                Submit
+                {formStatus === FormStatus.Loading && (
+                  <>
+                    <Loader2Icon className="animate-spin mr-2" /> Updating
+                  </>
+                )}
+
+                {formStatus !== FormStatus.Loading && "Update"}
               </Button>
             </CardContent>
-
-            <CardFooter>
-              <SignInFooter />
-            </CardFooter>
           </form>
         </Form>
       </Card>
@@ -122,4 +121,4 @@ const SignUpForm = () => {
   );
 };
 
-export default SignUpForm;
+export default UpdatePasswordForm;

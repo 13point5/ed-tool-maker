@@ -26,44 +26,54 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { SignInFooter } from "@/components/AuthFormFooters";
+import { useState } from "react";
+import { Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
+import { SignInFooter, SignUpFooter } from "@/components/AuthFormFooters";
 
 const formSchema = z.object({
   email: z.string(),
-  password: z.string(),
 });
 
-const SignUpForm = () => {
+enum FormStatus {
+  Idle,
+  Loading,
+  Error,
+  Success,
+}
+
+const ForgotPasswordForm = () => {
   const supabase = createClientComponentClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
+  // state for signin progress, error, and success
+  const [formStatus, setFormStatus] = useState<FormStatus>(FormStatus.Idle);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { error } = await supabase.auth.signUp({
-      email: values.email,
-      password: values.password,
-      options: {
-        emailRedirectTo: `${location.origin}/api/auth/callback`,
-      },
+    console.log("values", values);
+    setFormStatus(FormStatus.Loading);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
+      redirectTo: `${window.location.origin}/api/auth/update-password`,
     });
 
     if (error) {
       console.error(error);
+      setFormStatus(FormStatus.Error);
       toast.error(error.message, {
         position: "bottom-center",
       });
-
       return;
     }
 
-    toast.success("Check your email for the confirmation link", {
+    setFormStatus(FormStatus.Success);
+    toast.success("Password reset instructions sent to your email", {
       position: "bottom-center",
     });
   };
@@ -73,7 +83,11 @@ const SignUpForm = () => {
       <h1 className="text-4xl font-bold">ETM</h1>
       <Card className="max-w-sm w-full">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Create an account</CardTitle>
+          <CardTitle className="text-2xl">Reset Password</CardTitle>
+          <CardDescription>
+            We will send you instructions to update your password if you have
+            used this email to sign up
+          </CardDescription>
         </CardHeader>
 
         <Form {...form}>
@@ -93,27 +107,21 @@ const SignUpForm = () => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <Button type="submit" className="w-full">
-                Submit
+                {formStatus === FormStatus.Loading && (
+                  <>
+                    <Loader2Icon className="animate-spin mr-2" /> Sending
+                    Instructions
+                  </>
+                )}
+
+                {formStatus !== FormStatus.Loading && "Send Instructions"}
               </Button>
             </CardContent>
 
-            <CardFooter>
+            <CardFooter className="flex flex-col gap-2">
               <SignInFooter />
+              <SignUpFooter />
             </CardFooter>
           </form>
         </Form>
@@ -122,4 +130,4 @@ const SignUpForm = () => {
   );
 };
 
-export default SignUpForm;
+export default ForgotPasswordForm;

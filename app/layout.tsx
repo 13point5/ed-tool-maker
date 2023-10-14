@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
 import SupabaseAuthProvider from "@/lib/contexts/SupabaseAuthProvider";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,6 +34,8 @@ export default async function RootLayout({
         <SupabaseAuthProvider accessToken={accessToken}>
           {children}
         </SupabaseAuthProvider>
+
+        <Toaster />
       </body>
     </html>
   );

@@ -26,13 +26,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useState } from "react";
+import { Loader2Icon } from "lucide-react";
+import toast from "react-hot-toast";
+import {
+  ForgotPasswordFooter,
+  SignUpFooter,
+} from "@/components/AuthFormFooters";
 
 const formSchema = z.object({
   email: z.string(),
   password: z.string(),
 });
 
-const SignInPage = () => {
+enum FormStatus {
+  Idle,
+  Loading,
+  Error,
+  Success,
+}
+
+const SignInForm = () => {
   const supabase = createClientComponentClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,10 +57,11 @@ const SignInPage = () => {
     },
   });
 
+  // state for signin progress, error, and success
+  const [formStatus, setFormStatus] = useState<FormStatus>(FormStatus.Idle);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    setFormStatus(FormStatus.Loading);
 
     const res = await supabase.auth.signInWithPassword({
       email: values.email,
@@ -55,8 +70,17 @@ const SignInPage = () => {
 
     if (res.error) {
       console.error(res.error);
-      alert("Error signing in");
+      setFormStatus(FormStatus.Error);
+      toast.error("Could not Sign In", {
+        position: "bottom-center",
+      });
+      return;
     }
+
+    setFormStatus(FormStatus.Success);
+    toast.success("Signed In! Redirecting to your dashboard", {
+      position: "bottom-center",
+    });
   };
 
   return (
@@ -99,17 +123,19 @@ const SignInPage = () => {
               />
 
               <Button type="submit" className="w-full">
-                Sign In
+                {formStatus === FormStatus.Loading && (
+                  <>
+                    <Loader2Icon className="animate-spin mr-2" /> Signing In
+                  </>
+                )}
+
+                {formStatus !== FormStatus.Loading && "Sign In"}
               </Button>
             </CardContent>
 
-            <CardFooter>
-              <p className="text-sm text-muted-foreground">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" className="underline">
-                  Sign Up
-                </Link>
-              </p>
+            <CardFooter className="flex flex-col gap-2">
+              <ForgotPasswordFooter />
+              <SignUpFooter />
             </CardFooter>
           </form>
         </Form>
@@ -118,4 +144,4 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage;
+export default SignInForm;

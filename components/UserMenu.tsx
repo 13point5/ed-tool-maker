@@ -41,7 +41,10 @@ export const UserMenu = () => {
     console.log("sign out");
 
     try {
-      await supabase.auth.signOut();
+      const res = await supabase.auth.signOut();
+
+      if (res.error) throw new Error(res.error.message);
+
       router.refresh();
     } catch (error) {
       console.error(error);
