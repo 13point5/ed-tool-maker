@@ -7,6 +7,33 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const formatHTMLWithContent = (
+  html: string,
+  blocksContentById: BlocksState["data"]["contents"]
+) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const spans = doc.getElementsByTagName("span");
+
+  for (let i = spans.length - 1; i >= 0; i--) {
+    const span = spans[i];
+    const dataType = span.getAttribute("data-type");
+    const dataId = span.getAttribute("data-id");
+
+    if (dataType === "mention" && dataId) {
+      const newElement = doc.createTextNode(blocksContentById[dataId]);
+      span.parentNode?.replaceChild(newElement, span);
+    }
+  }
+
+  return doc.body.innerHTML
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replaceAll("<p>", "")
+    .replaceAll("</p>", "")
+    .trim();
+};
+
 export const formatHTMLWithMentions = (html: string) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");

@@ -52,6 +52,7 @@ import { Mention } from "@/components/at-mention/Renderer";
 import { mentionRendererClass, openAiApiKeyStorageKey } from "@/lib/constants";
 import {
   deleteMention,
+  formatHTMLWithContent,
   formatHTMLWithMentions,
   restoreHTMLFromMentions,
   updateMentionLabel,
@@ -232,13 +233,17 @@ function Builder({ data }: Props) {
 
     setResponse("");
 
+    const rawInstructions =
+      instructionsEditor?.getHTML() || settings.instructions;
+    const prompt = formatHTMLWithContent(rawInstructions, blocks.contents);
+
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        prompt: "hello world",
+        prompt,
         apiKey: localStorage.getItem(openAiApiKeyStorageKey),
       }),
     });
