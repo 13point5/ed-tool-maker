@@ -49,7 +49,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 
 import suggestion from "@/components/at-mention";
 import { Mention } from "@/components/at-mention/Renderer";
-import { mentionRendererClass } from "@/lib/constants";
+import { mentionRendererClass, openAiApiKeyStorageKey } from "@/lib/constants";
 import {
   deleteMention,
   formatHTMLWithMentions,
@@ -225,6 +225,46 @@ function Builder({ data }: Props) {
     });
   };
 
+  const [response, setResponse] = useState("");
+
+  const generateResponse = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    setResponse("");
+
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt: "hello world",
+        apiKey: localStorage.getItem(openAiApiKeyStorageKey),
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(res.statusText);
+    }
+
+    // This data is a ReadableStream
+    const data = res.body;
+    if (!data) {
+      return;
+    }
+
+    const reader = data.getReader();
+    const decoder = new TextDecoder();
+    let done = false;
+
+    while (!done) {
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      const chunkValue = decoder.decode(value);
+      setResponse((prev) => prev + chunkValue);
+    }
+  };
+
   return (
     <main className="w-screen min-h-screen flex flex-col">
       <Header toolData={data} />
@@ -285,7 +325,16 @@ function Builder({ data }: Props) {
             </div>
           )}
 
-          <Button className="w-full bg-blue-500 hover:bg-blue-700">Test</Button>
+          <Button
+            onClick={generateResponse}
+            className="w-full bg-blue-500 hover:bg-blue-700"
+          >
+            Test
+          </Button>
+
+          {response && (
+            <div className="whitespace-pre-wrap my-6 w-full">{response}</div>
+          )}
         </div>
 
         <div className="flex flex-col gap-4 p-4 w-[400px]">
