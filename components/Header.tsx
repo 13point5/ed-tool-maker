@@ -1,5 +1,5 @@
 import { Database } from "@/app/database.types";
-import { UserMenu } from "@/components/UserMenu";
+import { UserMenu } from "@/components/user-menu";
 import { Button } from "@/components/ui/button";
 import { ExternalLinkIcon } from "lucide-react";
 import Link from "next/link";

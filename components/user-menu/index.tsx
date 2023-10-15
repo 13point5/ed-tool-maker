@@ -1,15 +1,3 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +8,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ApikeyDialog } from "@/components/user-menu/api-key-dialog";
+import { SignOutDialog } from "@/components/user-menu/sign-out-dialog";
+import { openAiApiKeyStorageKey } from "@/lib/constants";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -54,6 +45,10 @@ export const UserMenu = () => {
     }
   };
 
+  const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false);
+
+  const handleOpenApiKeyDialog = () => setIsApiKeyDialogOpen(true);
+
   return (
     <>
       <DropdownMenu>
@@ -66,32 +61,25 @@ export const UserMenu = () => {
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Profile</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleOpenApiKeyDialog}>
+            API Keys
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={handleOpenSignoutDialog}>
             Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AlertDialog
+      <ApikeyDialog
+        open={isApiKeyDialogOpen}
+        onOpenChange={setIsApiKeyDialogOpen}
+      />
+
+      <SignOutDialog
         open={isSignoutDialogOpen}
         onOpenChange={setIsSignoutDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Sign Out</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to sign out?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSignOut}>
-              Sign Out
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        handleSignOut={handleSignOut}
+      />
     </>
   );
 };
