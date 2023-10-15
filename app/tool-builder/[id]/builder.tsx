@@ -44,6 +44,7 @@ import { Database } from "@/app/database.types";
 import { StoreApi, useStore } from "zustand";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import toast from "react-hot-toast";
+import { Instructions } from "@/app/tool-builder/[id]/instructions";
 
 type Props = {
   data: Database["public"]["Tables"]["tools"]["Row"];
@@ -255,6 +256,8 @@ function Builder({ data }: Props) {
               value={settings.instructions}
               onChange={handleInstructionsChange}
             />
+
+            <Instructions />
           </div>
 
           <div className="space-y-2">
