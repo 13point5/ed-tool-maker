@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,10 +25,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import * as z from "zod";
-import Link from "next/link";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { SignInFooter } from "@/components/AuthFormFooters";
 import toast from "react-hot-toast";
+import { Loader2Icon } from "lucide-react";
+
+enum FormStatus {
+  Idle,
+  Loading,
+  Error,
+  Success,
+}
 
 const formSchema = z.object({
   email: z.string(),
@@ -37,6 +45,7 @@ const formSchema = z.object({
 const SignUpForm = () => {
   const supabase = createClientComponentClient();
 
+  const [formStatus, setFormStatus] = useState<FormStatus>(FormStatus.Idle);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,6 +55,8 @@ const SignUpForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setFormStatus(FormStatus.Loading);
+
     const { error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
@@ -56,6 +67,7 @@ const SignUpForm = () => {
 
     if (error) {
       console.error(error);
+      setFormStatus(FormStatus.Error);
       toast.error(error.message, {
         position: "bottom-center",
       });
@@ -66,6 +78,7 @@ const SignUpForm = () => {
     toast.success("Check your email for the confirmation link", {
       position: "bottom-center",
     });
+    setFormStatus(FormStatus.Success);
   };
 
   return (
@@ -108,7 +121,13 @@ const SignUpForm = () => {
               />
 
               <Button type="submit" className="w-full">
-                Submit
+                {formStatus === FormStatus.Loading && (
+                  <>
+                    <Loader2Icon className="animate-spin mr-2" /> Signing up
+                  </>
+                )}
+
+                {formStatus !== FormStatus.Loading && "Sign Up"}
               </Button>
             </CardContent>
 

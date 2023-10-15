@@ -1,5 +1,6 @@
 "use client";
 
+import * as R from "ramda";
 import { useContext, useRef, useState } from "react";
 import {
   DndContext,
@@ -27,8 +28,6 @@ import {
   BlocksStoreContext,
   createBlocksStore,
 } from "@/lib/blocksStore";
-import { UserMenu } from "@/components/UserMenu";
-import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -40,16 +39,19 @@ import {
 } from "@/components/ui/select";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
-import { ExternalLinkIcon, PlusIcon, SaveIcon } from "lucide-react";
+import { Loader2Icon, PlusIcon, SaveIcon } from "lucide-react";
 import { Database } from "@/app/database.types";
 import { StoreApi, useStore } from "zustand";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import toast from "react-hot-toast";
 
 type Props = {
   data: Database["public"]["Tables"]["tools"]["Row"];
 };
 
 const BuilderBla = ({ data }: Props) => {
-  const store = useRef(createBlocksStore()).current;
+  // @ts-ignore
+  const store = useRef(createBlocksStore(data.data?.blocks || [])).current;
 
   return (
     <BlocksStoreContext.Provider value={store}>
@@ -60,8 +62,59 @@ const BuilderBla = ({ data }: Props) => {
 
 export default BuilderBla;
 
+type ToolSettings = {
+  instructions: string;
+  model: string;
+};
+
+enum FormStatus {
+  Idle,
+  Loading,
+  Error,
+  Success,
+}
+
 function Builder({ data }: Props) {
-  const [prompt, setPrompt] = useState("");
+  const supabase = createClientComponentClient<Database>();
+
+  const [name, setName] = useState(data.name || "");
+  const handleNameChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setName(e.target.value);
+  };
+
+  const [description, setDescription] = useState(data.description || "");
+  const handleDescriptionChange: React.ChangeEventHandler<HTMLInputElement> = (
+    e
+  ) => {
+    setDescription(e.target.value);
+  };
+
+  const [settings, setSettings] = useState<ToolSettings>(
+    (data.settings as ToolSettings) || {
+      instructions: "",
+      model: "gpt-3.5-turbo",
+    }
+  );
+
+  const handleInstructionsChange: React.ChangeEventHandler<
+    HTMLTextAreaElement
+  > = (e) => {
+    const { value } = e.target;
+
+    setSettings((prev) =>
+      R.mergeDeepRight(prev, {
+        instructions: value,
+      })
+    );
+  };
+
+  const handleModelChange = (value: string) => {
+    setSettings((prev) =>
+      R.mergeDeepRight(prev, {
+        model: value,
+      })
+    );
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -100,12 +153,30 @@ function Builder({ data }: Props) {
     }
   }
 
-  const handlePromptChange: React.ChangeEventHandler<HTMLTextAreaElement> = (
-    e
-  ) => {
-    const { value } = e.target;
+  const [saveStatus, setSaveStatus] = useState<FormStatus>(FormStatus.Idle);
+  const handleSave = async () => {
+    setSaveStatus(FormStatus.Loading);
 
-    setPrompt(value);
+    const { error } = await supabase.from("tools").upsert({
+      id: data.id,
+      name,
+      description,
+      settings,
+      data: {
+        blocks: Object.values(blocks.entities),
+      },
+    });
+
+    if (error) {
+      console.error(error);
+      setSaveStatus(FormStatus.Error);
+      return;
+    }
+
+    setSaveStatus(FormStatus.Success);
+    toast.success("Saved!", {
+      position: "bottom-center",
+    });
   };
 
   return (
@@ -170,43 +241,52 @@ function Builder({ data }: Props) {
 
           <div className="space-y-2">
             <Label>Name</Label>
-            <Input />
+            <Input value={name} onChange={handleNameChange} />
           </div>
 
           <div className="space-y-2">
             <Label>Description</Label>
-            <Input />
+            <Input value={description} onChange={handleDescriptionChange} />
           </div>
 
           <div className="space-y-2">
             <Label>Instructions</Label>
-            <Textarea />
+            <Textarea
+              value={settings.instructions}
+              onChange={handleInstructionsChange}
+            />
           </div>
 
           <div className="space-y-2">
             <Label>Model</Label>
-            <Select>
+            <Select value={settings.model} onValueChange={handleModelChange}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choose Model" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="light">GPT 3.5</SelectItem>
-                <SelectItem value="dark">GPT 4</SelectItem>
+                <SelectItem value="gpt-3.5-turbo">GPT 3.5</SelectItem>
+                <SelectItem value="gpt-4">GPT 4</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <Button className="w-full" variant="outline">
-            <SaveIcon className="mr-2 w-4 h-4" />
-            Save
-          </Button>
-
           <Button
             className="w-full bg-blue-500 hover:bg-blue-700"
             color="primary"
+            onClick={handleSave}
           >
-            <ExternalLinkIcon className="mr-2 w-4 h-4" />
-            Publish
+            {saveStatus === FormStatus.Loading && (
+              <>
+                <Loader2Icon className="animate-spin mr-2" /> Saving
+              </>
+            )}
+
+            {saveStatus !== FormStatus.Loading && (
+              <>
+                <SaveIcon className="mr-2 w-4 h-4" />
+                Save
+              </>
+            )}
           </Button>
         </div>
       </div>

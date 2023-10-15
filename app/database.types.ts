@@ -17,7 +17,6 @@ export interface Database {
           description: string | null
           id: string
           name: string
-          published: boolean | null
           settings: Json | null
           type: string
         }
@@ -28,7 +27,6 @@ export interface Database {
           description?: string | null
           id?: string
           name: string
-          published?: boolean | null
           settings?: Json | null
           type?: string
         }
@@ -39,7 +37,6 @@ export interface Database {
           description?: string | null
           id?: string
           name?: string
-          published?: boolean | null
           settings?: Json | null
           type?: string
         }

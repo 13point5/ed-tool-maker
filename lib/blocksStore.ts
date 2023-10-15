@@ -20,42 +20,6 @@ type BlocksData = {
   entities: Record<BlockData["id"], BlockData>;
 };
 
-const initialState: BlocksData = {
-  ids: ["1", "2", "3", "4", "5", "6"],
-  entities: {
-    "1": {
-      id: "1",
-      type: BlockType.shortText,
-      label: "Short Input 1",
-    },
-    "2": {
-      id: "2",
-      type: BlockType.longText,
-      label: "Long Input 1",
-    },
-    "3": {
-      id: "3",
-      type: BlockType.shortText,
-      label: "Short Input 2",
-    },
-    "4": {
-      id: "4",
-      type: BlockType.shortText,
-      label: "Short Input 3",
-    },
-    "5": {
-      id: "5",
-      type: BlockType.shortText,
-      label: "Short Input 4",
-    },
-    "6": {
-      id: "6",
-      type: BlockType.shortText,
-      label: "Short Input 4",
-    },
-  },
-};
-
 export type BlocksState = {
   data: BlocksData;
 
@@ -80,6 +44,7 @@ const getBlockIndexById = (blocks: BlockData["id"][], id: string) => {
 };
 
 export const createBlocksStore = (initialBlocks: BlockData[] = []) => {
+  console.log("initialBlocks", initialBlocks);
   const initialState: BlocksData = {
     ids: [],
     entities: {},
@@ -177,12 +142,13 @@ export const createBlocksStore = (initialBlocks: BlockData[] = []) => {
         const newIds = state.data.ids.filter((blockId) => blockId !== id);
         const newEntities = R.omit([id], state.data.entities);
 
-        return R.mergeDeepRight(state, {
+        return {
+          ...state,
           data: {
             ids: newIds,
             entities: newEntities,
           },
-        });
+        };
       });
     },
   }));
