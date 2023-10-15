@@ -44,7 +44,6 @@ import { Database } from "@/app/database.types";
 import { StoreApi, useStore } from "zustand";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import toast from "react-hot-toast";
-import { Instructions } from "@/app/tool-builder/[id]/instructions";
 
 type Props = {
   data: Database["public"]["Tables"]["tools"]["Row"];
@@ -96,15 +95,14 @@ function Builder({ data }: Props) {
       model: "gpt-3.5-turbo",
     }
   );
+  console.log("settings", settings);
 
   const handleInstructionsChange: React.ChangeEventHandler<
     HTMLTextAreaElement
   > = (e) => {
-    const { value } = e.target;
-
     setSettings((prev) =>
       R.mergeDeepRight(prev, {
-        instructions: value,
+        instructions: e.target.value,
       })
     );
   };
@@ -252,12 +250,11 @@ function Builder({ data }: Props) {
 
           <div className="space-y-2">
             <Label>Instructions</Label>
+
             <Textarea
               value={settings.instructions}
               onChange={handleInstructionsChange}
             />
-
-            <Instructions />
           </div>
 
           <div className="space-y-2">
