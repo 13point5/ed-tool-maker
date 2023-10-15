@@ -1,3 +1,4 @@
+import { BlocksState } from "@/lib/blocksStore";
 import { mentionRendererClass } from "@/lib/constants";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -24,6 +25,19 @@ export const formatHTMLWithMentions = (html: string) => {
   }
 
   return doc.body.innerHTML.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+};
+
+export const restoreHTMLFromMentions = (
+  html: string,
+  blocksById: BlocksState["data"]["entities"]
+) => {
+  const blockIdRegex = /<@block:(.*?)>/g;
+  const restoredHtml = html.replace(blockIdRegex, (_, blockId) => {
+    const dataLabel = blocksById[blockId]?.label || "";
+    return `<span data-type="mention" class="${mentionRendererClass}" data-id="${blockId}" data-label="${dataLabel}"></span>`;
+  });
+
+  return restoredHtml;
 };
 
 export const updateMentionLabel = (html: string, id: string, label: string) => {
@@ -60,15 +74,4 @@ export const deleteMention = (html: string, id: string) => {
   }
 
   return doc.body.innerHTML;
-};
-
-export const restoreHTMLFromMentions = (html: string) => {
-  const blockIdRegex = /<@block:(.*?)>/g;
-  const restoredHtml = html.replace(blockIdRegex, (_, blockId) => {
-    // const dataLabel = getMentionLabel(blockId);
-    const dataLabel = "bla";
-    return `<span data-type="mention" class="${mentionRendererClass}" data-id="${blockId}" data-label="${dataLabel}"></span>`;
-  });
-
-  return restoredHtml;
 };

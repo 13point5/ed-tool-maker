@@ -50,7 +50,12 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import suggestion from "@/components/at-mention";
 import { Mention } from "@/components/at-mention/Renderer";
 import { mentionRendererClass } from "@/lib/constants";
-import { deleteMention, updateMentionLabel } from "@/lib/utils";
+import {
+  deleteMention,
+  formatHTMLWithMentions,
+  restoreHTMLFromMentions,
+  updateMentionLabel,
+} from "@/lib/utils";
 
 type Props = {
   data: Database["public"]["Tables"]["tools"]["Row"];
@@ -133,7 +138,7 @@ function Builder({ data }: Props) {
         },
       }),
     ],
-    content: settings.instructions,
+    content: restoreHTMLFromMentions(settings.instructions, blocks.entities),
   });
 
   const onBlockLabelChange = ({ id, label }: { id: string; label: string }) => {
@@ -192,13 +197,16 @@ function Builder({ data }: Props) {
   const handleSave = async () => {
     setSaveStatus(FormStatus.Loading);
 
+    const rawInstructions =
+      instructionsEditor?.getHTML() || settings.instructions;
+
     const { error } = await supabase.from("tools").upsert({
       id: data.id,
       name,
       description,
       settings: {
         ...settings,
-        instructions: instructionsEditor?.getHTML() || settings.instructions,
+        instructions: formatHTMLWithMentions(rawInstructions),
       },
       data: {
         blocks: Object.values(blocks.entities),
