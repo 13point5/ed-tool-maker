@@ -19,6 +19,7 @@ export interface Database {
           name: string
           published: boolean | null
           settings: Json | null
+          type: string
         }
         Insert: {
           created_at?: string
@@ -29,6 +30,7 @@ export interface Database {
           name: string
           published?: boolean | null
           settings?: Json | null
+          type?: string
         }
         Update: {
           created_at?: string
@@ -39,6 +41,7 @@ export interface Database {
           name?: string
           published?: boolean | null
           settings?: Json | null
+          type?: string
         }
         Relationships: [
           {

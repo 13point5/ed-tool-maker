@@ -16,7 +16,6 @@ const DashboardPage = async () => {
   }
 
   const data = await supabase.from("tools").select("*");
-  console.log("data", data);
 
   return <Dashboard tools={data.data || []} />;
 };

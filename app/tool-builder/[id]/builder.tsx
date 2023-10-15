@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useRef, useState } from "react";
 import {
   DndContext,
   closestCenter,
@@ -21,7 +21,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { SortableItem } from "@/components/Block/SortableItem";
 import { BlockItem } from "@/components/Block/Item";
-import { useBlocksStore } from "@/lib/blocksStore";
+import {
+  BlockType,
+  BlocksState,
+  BlocksStoreContext,
+  createBlocksStore,
+} from "@/lib/blocksStore";
 import { UserMenu } from "@/components/UserMenu";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
@@ -35,9 +40,27 @@ import {
 } from "@/components/ui/select";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
-import { ExternalLinkIcon, SaveIcon } from "lucide-react";
+import { ExternalLinkIcon, PlusIcon, SaveIcon } from "lucide-react";
+import { Database } from "@/app/database.types";
+import { StoreApi, useStore } from "zustand";
 
-export default function Home() {
+type Props = {
+  data: Database["public"]["Tables"]["tools"]["Row"];
+};
+
+const BuilderBla = ({ data }: Props) => {
+  const store = useRef(createBlocksStore()).current;
+
+  return (
+    <BlocksStoreContext.Provider value={store}>
+      <Builder data={data} />
+    </BlocksStoreContext.Provider>
+  );
+};
+
+export default BuilderBla;
+
+function Builder({ data }: Props) {
   const [prompt, setPrompt] = useState("");
 
   const sensors = useSensors(
@@ -47,7 +70,16 @@ export default function Home() {
     })
   );
 
-  const { activeBlockId, setActiveBlockId, data, moveBlock } = useBlocksStore();
+  // @ts-ignore
+  const store: StoreApi<BlocksState> = useContext(BlocksStoreContext);
+  const {
+    activeBlockId,
+    setActiveBlockId,
+    data: blocks,
+    moveBlock,
+    addFirstBlock,
+  } = useStore(store);
+  console.log("blocks", blocks);
 
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;
@@ -78,32 +110,57 @@ export default function Home() {
 
   return (
     <main className="w-screen min-h-screen flex flex-col">
-      <Header />
+      <Header toolData={data} />
 
       <div className="grow flex gap-0">
         <div className="grow flex flex-col gap-8 items-center border-r-2 p-4">
-          <div className="flex flex-col gap-0 grow w-full">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={data.ids}
-                strategy={verticalListSortingStrategy}
+          {blocks.ids.length === 0 && (
+            <div className="flex gap-4 items-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => addFirstBlock(BlockType.shortText)}
               >
-                {data.ids.map((blockId) => (
-                  <SortableItem key={blockId} data={data.entities[blockId]} />
-                ))}
-              </SortableContext>
-              <DragOverlay>
-                {activeBlockId ? (
-                  <BlockItem data={data.entities[activeBlockId]} />
-                ) : null}
-              </DragOverlay>
-            </DndContext>
-          </div>
+                <PlusIcon className="mr-2 h-4 w-4" /> Short Input
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => addFirstBlock(BlockType.longText)}
+              >
+                <PlusIcon className="mr-2 h-4 w-4" /> Long Input
+              </Button>
+            </div>
+          )}
+
+          {blocks.ids.length > 0 && (
+            <div className="flex flex-col gap-0 w-full">
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={blocks.ids}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {blocks.ids.map((blockId) => (
+                    <SortableItem
+                      key={blockId}
+                      data={blocks.entities[blockId]}
+                    />
+                  ))}
+                </SortableContext>
+                <DragOverlay>
+                  {activeBlockId ? (
+                    <BlockItem data={blocks.entities[activeBlockId]} />
+                  ) : null}
+                </DragOverlay>
+              </DndContext>
+            </div>
+          )}
 
           <Button className="w-full bg-blue-500 hover:bg-blue-700">Test</Button>
         </div>

@@ -1,11 +1,17 @@
-import { useState, LegacyRef, forwardRef } from "react";
+"use client";
 
-import { BlockData, BlockType } from "@/lib/blocksStore";
+import { useState, LegacyRef, forwardRef, useContext } from "react";
+
+import {
+  BlockData,
+  BlockType,
+  BlocksStoreContext,
+  BlocksState,
+} from "@/lib/blocksStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useBlocksStore } from "@/lib/blocksStore";
 import {
   EditIcon,
   GripHorizontalIcon,
@@ -13,6 +19,7 @@ import {
   TrashIcon,
 } from "lucide-react";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
+import { useStore, StoreApi } from "zustand";
 
 type Props = {
   listeners?: SyntheticListenerMap | undefined;
@@ -28,8 +35,9 @@ const Item = forwardRef(
   ) => {
     const { type, label, id } = data;
 
-    const { updateBlockLabel, insertBlockBelow, deleteBlock } =
-      useBlocksStore();
+    // @ts-ignore
+    const store: StoreApi<BlocksState> = useContext(BlocksStoreContext);
+    const { updateBlockLabel, insertBlockBelow, deleteBlock } = useStore(store);
 
     const [editingLabel, setEditingLabel] = useState(false);
     const [tempLabel, setTempLabel] = useState(label);

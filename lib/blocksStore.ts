@@ -1,7 +1,8 @@
 import * as R from "ramda";
-import { create } from "zustand";
+import { createStore } from "zustand";
 import { arrayMove } from "@dnd-kit/sortable";
 import { nanoid } from "nanoid";
+import { createContext } from "react";
 
 export enum BlockType {
   shortText = "shortText",
@@ -14,12 +15,12 @@ export type BlockData = {
   label: string;
 };
 
-type BlocksState = {
+type BlocksData = {
   ids: BlockData["id"][];
   entities: Record<BlockData["id"], BlockData>;
 };
 
-const initialState: BlocksState = {
+const initialState: BlocksData = {
   ids: ["1", "2", "3", "4", "5", "6"],
   entities: {
     "1": {
@@ -55,12 +56,13 @@ const initialState: BlocksState = {
   },
 };
 
-type BlocksStore = {
-  data: BlocksState;
+export type BlocksState = {
+  data: BlocksData;
 
   activeBlockId: BlockData["id"] | null;
   setActiveBlockId: (id: BlockData["id"] | null) => void;
 
+  addFirstBlock: (type: BlockType) => void;
   insertBlockBelow: (params: {
     currentBlockId: BlockData["id"];
     type: BlockType;
@@ -77,79 +79,115 @@ const getBlockIndexById = (blocks: BlockData["id"][], id: string) => {
   return blocks.findIndex((blockId) => blockId === id);
 };
 
-export const useBlocksStore = create<BlocksStore>()((set, get) => ({
-  data: initialState,
+export const createBlocksStore = (initialBlocks: BlockData[] = []) => {
+  const initialState: BlocksData = {
+    ids: [],
+    entities: {},
+  };
 
-  activeBlockId: null,
-  setActiveBlockId: (id) => {
-    set({ activeBlockId: id });
-  },
+  initialBlocks.forEach((block) => {
+    initialState.ids.push(block.id);
+    initialState.entities[block.id] = block;
+  });
 
-  insertBlockBelow: ({ currentBlockId, type }) => {
-    set((state) => {
-      const newBlockData: BlockData = {
-        id: nanoid(),
-        type,
-        label: "Untitled",
-      };
+  return createStore<BlocksState>()((set, get) => ({
+    data: initialState,
 
-      return R.mergeDeepRight(state, {
-        data: {
-          ids: R.insert(
-            getBlockIndexById(state.data.ids, currentBlockId) + 1,
-            newBlockData.id,
-            state.data.ids
-          ),
-          entities: {
-            [newBlockData.id]: newBlockData,
-          },
-        },
-      });
-    });
-  },
+    activeBlockId: null,
+    setActiveBlockId: (id) => {
+      set({ activeBlockId: id });
+    },
 
-  moveBlock: ({ activeId, overId }) => {
-    set((state) => {
-      const items = state.data.ids;
+    addFirstBlock: (blockType) => {
+      set((state) => {
+        const newBlockData: BlockData = {
+          id: nanoid(),
+          type: blockType,
+          label: "Untitled",
+        };
+        console.log("newBlockData", newBlockData);
 
-      const oldIndex = getBlockIndexById(items, activeId);
-      const newIndex = getBlockIndexById(items, overId);
-
-      const newIds = arrayMove(items, oldIndex, newIndex);
-
-      return R.mergeDeepRight(state, {
-        data: {
-          ids: newIds,
-        },
-      });
-    });
-  },
-
-  updateBlockLabel: ({ id, label }) => {
-    set((state) =>
-      R.mergeDeepRight(state, {
-        data: {
-          entities: {
-            [id]: {
-              label,
+        return R.mergeDeepRight(state, {
+          data: {
+            ids: [newBlockData.id],
+            entities: {
+              [newBlockData.id]: newBlockData,
             },
           },
-        },
-      })
-    );
-  },
-
-  deleteBlock: (id) => {
-    set((state) => {
-      const newIds = state.data.ids.filter((blockId) => blockId !== id);
-      const newEntities = R.omit([id], state.data.entities);
-
-      return R.mergeDeepRight(state, {
-        data: {
-          ids: newIds,
-          entities: newEntities,
-        },
+        });
       });
-    });
-  },
-}));
+    },
+
+    insertBlockBelow: ({ currentBlockId, type }) => {
+      set((state) => {
+        const newBlockData: BlockData = {
+          id: nanoid(),
+          type,
+          label: "Untitled",
+        };
+
+        return R.mergeDeepRight(state, {
+          data: {
+            ids: R.insert(
+              getBlockIndexById(state.data.ids, currentBlockId) + 1,
+              newBlockData.id,
+              state.data.ids
+            ),
+            entities: {
+              [newBlockData.id]: newBlockData,
+            },
+          },
+        });
+      });
+    },
+
+    moveBlock: ({ activeId, overId }) => {
+      set((state) => {
+        const items = state.data.ids;
+
+        const oldIndex = getBlockIndexById(items, activeId);
+        const newIndex = getBlockIndexById(items, overId);
+
+        const newIds = arrayMove(items, oldIndex, newIndex);
+
+        return R.mergeDeepRight(state, {
+          data: {
+            ids: newIds,
+          },
+        });
+      });
+    },
+
+    updateBlockLabel: ({ id, label }) => {
+      set((state) =>
+        R.mergeDeepRight(state, {
+          data: {
+            entities: {
+              [id]: {
+                label,
+              },
+            },
+          },
+        })
+      );
+    },
+
+    deleteBlock: (id) => {
+      set((state) => {
+        const newIds = state.data.ids.filter((blockId) => blockId !== id);
+        const newEntities = R.omit([id], state.data.entities);
+
+        return R.mergeDeepRight(state, {
+          data: {
+            ids: newIds,
+            entities: newEntities,
+          },
+        });
+      });
+    },
+  }));
+};
+
+type BlocksStoreType = ReturnType<typeof createBlocksStore>;
+
+export const BlocksStoreContext = createContext<BlocksStoreType | null>(null);

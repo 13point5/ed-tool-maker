@@ -32,10 +32,6 @@ export default function Dashboard({ tools }: Props) {
               description={tool.description}
             />
           ))}
-
-          {/* {Array.from(Array(10).keys()).map((i) => (
-            <ToolPreviewCard key={i} />
-          ))} */}
         </div>
       </div>
     </main>
