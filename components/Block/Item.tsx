@@ -27,11 +27,19 @@ export type Props = {
   setActivatorNodeRef?: (element: HTMLElement | null) => void;
   style?: Object;
   onLabelChange: (params: { id: BlockData["id"]; label: string }) => void;
+  onDelete: (id: BlockData["id"]) => void;
 };
 
 const Item = forwardRef(
   (
-    { id, listeners, setActivatorNodeRef, onLabelChange, ...props }: Props,
+    {
+      id,
+      listeners,
+      setActivatorNodeRef,
+      onLabelChange,
+      onDelete,
+      ...props
+    }: Props,
     ref: LegacyRef<HTMLDivElement>
   ) => {
     // @ts-ignore
@@ -83,6 +91,7 @@ const Item = forwardRef(
     };
 
     const handleDelete = () => {
+      onDelete(id);
       deleteBlock(id);
     };
 

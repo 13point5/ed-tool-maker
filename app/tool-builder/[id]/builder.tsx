@@ -50,7 +50,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import suggestion from "@/components/at-mention";
 import { Mention } from "@/components/at-mention/Renderer";
 import { mentionRendererClass } from "@/lib/constants";
-import { updateMentionLabel } from "@/lib/utils";
+import { deleteMention, updateMentionLabel } from "@/lib/utils";
 
 type Props = {
   data: Database["public"]["Tables"]["tools"]["Row"];
@@ -141,6 +141,16 @@ function Builder({ data }: Props) {
 
     const html = instructionsEditor.getHTML();
     const res = updateMentionLabel(html, id, label);
+    instructionsEditor.commands.setContent(res);
+  };
+
+  const onBlockDelete = (id: string) => {
+    console.log("on delete", id);
+
+    if (!instructionsEditor) return;
+
+    const html = instructionsEditor.getHTML();
+    const res = deleteMention(html, id);
     instructionsEditor.commands.setContent(res);
   };
 
@@ -250,6 +260,7 @@ function Builder({ data }: Props) {
                       key={blockId}
                       id={blockId}
                       onLabelChange={onBlockLabelChange}
+                      onDelete={onBlockDelete}
                     />
                   ))}
                 </SortableContext>
@@ -258,6 +269,7 @@ function Builder({ data }: Props) {
                     <BlockItem
                       id={activeBlockId}
                       onLabelChange={onBlockLabelChange}
+                      onDelete={onBlockDelete}
                     />
                   ) : null}
                 </DragOverlay>

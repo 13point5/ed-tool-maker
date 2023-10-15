@@ -44,6 +44,24 @@ export const updateMentionLabel = (html: string, id: string, label: string) => {
   return doc.body.innerHTML;
 };
 
+export const deleteMention = (html: string, id: string) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const spans = doc.getElementsByTagName("span");
+
+  for (let i = spans.length - 1; i >= 0; i--) {
+    const span = spans[i];
+    const dataType = span.getAttribute("data-type");
+    const dataId = span.getAttribute("data-id");
+
+    if (dataType === "mention" && dataId === id) {
+      span.remove();
+    }
+  }
+
+  return doc.body.innerHTML;
+};
+
 export const restoreHTMLFromMentions = (html: string) => {
   const blockIdRegex = /<@block:(.*?)>/g;
   const restoredHtml = html.replace(blockIdRegex, (_, blockId) => {

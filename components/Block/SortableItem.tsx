@@ -8,9 +8,10 @@ import { BlockData } from "@/lib/blocksStore";
 type Props = {
   id: BlockData["id"];
   onLabelChange: ItemProps["onLabelChange"];
+  onDelete: ItemProps["onDelete"];
 };
 
-export const SortableItem = ({ id, onLabelChange }: Props) => {
+export const SortableItem = ({ id, onLabelChange, onDelete }: Props) => {
   const {
     attributes,
     listeners,
@@ -34,6 +35,7 @@ export const SortableItem = ({ id, onLabelChange }: Props) => {
       listeners={listeners}
       id={id}
       onLabelChange={onLabelChange}
+      onDelete={onDelete}
     />
   );
 };
