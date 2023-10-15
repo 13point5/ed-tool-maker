@@ -2,16 +2,15 @@ import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-import { BlockItem } from "./Item";
+import { BlockItem, Props as ItemProps } from "./Item";
 import { BlockData } from "@/lib/blocksStore";
 
 type Props = {
-  data: BlockData;
+  id: BlockData["id"];
+  onLabelChange: ItemProps["onLabelChange"];
 };
 
-export const SortableItem = ({ data }: Props) => {
-  const { id } = data;
-
+export const SortableItem = ({ id, onLabelChange }: Props) => {
   const {
     attributes,
     listeners,
@@ -33,7 +32,8 @@ export const SortableItem = ({ data }: Props) => {
       {...attributes}
       setActivatorNodeRef={setActivatorNodeRef}
       listeners={listeners}
-      data={data}
+      id={id}
+      onLabelChange={onLabelChange}
     />
   );
 };

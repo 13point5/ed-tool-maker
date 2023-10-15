@@ -1,7 +1,7 @@
 "use client";
 
 import * as R from "ramda";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   DndContext,
   closestCenter,
@@ -49,6 +49,8 @@ import { EditorContent, useEditor } from "@tiptap/react";
 
 import suggestion from "@/components/at-mention";
 import { Mention } from "@/components/at-mention/Renderer";
+import { mentionRendererClass } from "@/lib/constants";
+import { updateMentionLabel } from "@/lib/utils";
 
 type Props = {
   data: Database["public"]["Tables"]["tools"]["Row"];
@@ -79,28 +81,19 @@ enum FormStatus {
   Success,
 }
 
-export const formatHTMLWithMentions = (html: string) => {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  const spans = doc.getElementsByTagName("span");
-
-  for (let i = spans.length - 1; i >= 0; i--) {
-    const span = spans[i];
-    const dataType = span.getAttribute("data-type");
-    const dataId = span.getAttribute("data-id");
-
-    if (dataType === "mention" && dataId) {
-      const blockId = `<@block:${dataId}>`;
-      const newElement = doc.createTextNode(blockId);
-      span.parentNode?.replaceChild(newElement, span);
-    }
-  }
-
-  return doc.body.innerHTML.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-};
-
 function Builder({ data }: Props) {
   const supabase = createClientComponentClient<Database>();
+
+  // @ts-ignore
+  const store: StoreApi<BlocksState> = useContext(BlocksStoreContext);
+  const {
+    activeBlockId,
+    setActiveBlockId,
+    data: blocks,
+    moveBlock,
+    addFirstBlock,
+  } = useStore(store);
+  console.log("blocks", blocks);
 
   const [name, setName] = useState(data.name || "");
   const handleNameChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -120,7 +113,6 @@ function Builder({ data }: Props) {
       model: "gpt-3.5-turbo",
     }
   );
-  console.log("settings", settings);
 
   const instructionsEditor = useEditor({
     ...editorConfig,
@@ -129,7 +121,7 @@ function Builder({ data }: Props) {
 
       Mention.configure({
         HTMLAttributes: {
-          class: "p-1 rounded-sm bg-blue-300",
+          class: mentionRendererClass,
         },
         suggestion: {
           render: suggestion.render,
@@ -143,6 +135,14 @@ function Builder({ data }: Props) {
     ],
     content: settings.instructions,
   });
+
+  const onBlockLabelChange = ({ id, label }: { id: string; label: string }) => {
+    if (!instructionsEditor) return;
+
+    const html = instructionsEditor.getHTML();
+    const res = updateMentionLabel(html, id, label);
+    instructionsEditor.commands.setContent(res);
+  };
 
   const handleModelChange = (value: string) => {
     setSettings((prev) =>
@@ -158,17 +158,6 @@ function Builder({ data }: Props) {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-
-  // @ts-ignore
-  const store: StoreApi<BlocksState> = useContext(BlocksStoreContext);
-  const {
-    activeBlockId,
-    setActiveBlockId,
-    data: blocks,
-    moveBlock,
-    addFirstBlock,
-  } = useStore(store);
-  console.log("blocks", blocks);
 
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;
@@ -259,13 +248,17 @@ function Builder({ data }: Props) {
                   {blocks.ids.map((blockId) => (
                     <SortableItem
                       key={blockId}
-                      data={blocks.entities[blockId]}
+                      id={blockId}
+                      onLabelChange={onBlockLabelChange}
                     />
                   ))}
                 </SortableContext>
                 <DragOverlay>
                   {activeBlockId ? (
-                    <BlockItem data={blocks.entities[activeBlockId]} />
+                    <BlockItem
+                      id={activeBlockId}
+                      onLabelChange={onBlockLabelChange}
+                    />
                   ) : null}
                 </DragOverlay>
               </DndContext>
@@ -290,11 +283,6 @@ function Builder({ data }: Props) {
 
           <div className="space-y-2">
             <Label>Instructions</Label>
-
-            {/* <Textarea
-              value={settings.instructions}
-              onChange={handleInstructionsChange}
-            /> */}
 
             <EditorContent
               editor={instructionsEditor}

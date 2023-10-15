@@ -21,23 +21,34 @@ import {
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { useStore, StoreApi } from "zustand";
 
-type Props = {
+export type Props = {
+  id: BlockData["id"];
   listeners?: SyntheticListenerMap | undefined;
   setActivatorNodeRef?: (element: HTMLElement | null) => void;
-  data: BlockData;
   style?: Object;
+  onLabelChange: (params: { id: BlockData["id"]; label: string }) => void;
 };
 
 const Item = forwardRef(
   (
-    { data, listeners, setActivatorNodeRef, ...props }: Props,
+    { id, listeners, setActivatorNodeRef, onLabelChange, ...props }: Props,
     ref: LegacyRef<HTMLDivElement>
   ) => {
-    const { type, label, id } = data;
-
     // @ts-ignore
     const store: StoreApi<BlocksState> = useContext(BlocksStoreContext);
-    const { updateBlockLabel, insertBlockBelow, deleteBlock } = useStore(store);
+    const {
+      updateBlockLabel,
+      insertBlockBelow,
+      deleteBlock,
+      getBlockData,
+      updateBlockContent,
+      getBlockContent,
+    } = useStore(store);
+
+    const data = getBlockData(id);
+    const { type, label } = data;
+
+    const content = getBlockContent(id);
 
     const [editingLabel, setEditingLabel] = useState(false);
     const [tempLabel, setTempLabel] = useState(label);
@@ -54,6 +65,7 @@ const Item = forwardRef(
 
     const handleSave = () => {
       updateBlockLabel({ id, label: tempLabel });
+      onLabelChange({ id, label: tempLabel });
       setEditingLabel(false);
     };
 
@@ -148,8 +160,22 @@ const Item = forwardRef(
             )}
           </div>
 
-          {type === BlockType.longText && <Textarea />}
-          {type === BlockType.shortText && <Input />}
+          {type === BlockType.longText && (
+            <Textarea
+              value={content}
+              onChange={(e) =>
+                updateBlockContent({ id, content: e.target.value })
+              }
+            />
+          )}
+          {type === BlockType.shortText && (
+            <Input
+              value={content}
+              onChange={(e) =>
+                updateBlockContent({ id, content: e.target.value })
+              }
+            />
+          )}
         </div>
 
         <div className="flex gap-4 items-center justify-center absolute -bottom-4 inset-x-0 invisible group-hover:visible">

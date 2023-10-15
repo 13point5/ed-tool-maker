@@ -18,6 +18,7 @@ export type BlockData = {
 type BlocksData = {
   ids: BlockData["id"][];
   entities: Record<BlockData["id"], BlockData>;
+  contents: Record<BlockData["id"], string>;
 };
 
 export type BlocksState = {
@@ -26,12 +27,19 @@ export type BlocksState = {
   activeBlockId: BlockData["id"] | null;
   setActiveBlockId: (id: BlockData["id"] | null) => void;
 
+  getBlockData: (id: BlockData["id"]) => BlockData;
+  getBlockContent: (id: BlockData["id"]) => string;
+
   addFirstBlock: (type: BlockType) => void;
   insertBlockBelow: (params: {
     currentBlockId: BlockData["id"];
     type: BlockType;
   }) => void;
   updateBlockLabel: (params: { id: BlockData["id"]; label: string }) => void;
+  updateBlockContent: (params: {
+    id: BlockData["id"];
+    content: string;
+  }) => void;
   moveBlock: (params: {
     activeId: BlockData["id"];
     overId: BlockData["id"];
@@ -48,11 +56,13 @@ export const createBlocksStore = (initialBlocks: BlockData[] = []) => {
   const initialState: BlocksData = {
     ids: [],
     entities: {},
+    contents: {},
   };
 
   initialBlocks.forEach((block) => {
     initialState.ids.push(block.id);
     initialState.entities[block.id] = block;
+    initialState.contents[block.id] = "";
   });
 
   return createStore<BlocksState>()((set, get) => ({
@@ -62,6 +72,12 @@ export const createBlocksStore = (initialBlocks: BlockData[] = []) => {
     setActiveBlockId: (id) => {
       set({ activeBlockId: id });
     },
+
+    getBlockData: (id) => {
+      return get().data.entities[id];
+    },
+
+    getBlockContent: (id) => get().data.contents[id],
 
     addFirstBlock: (blockType) => {
       set((state) => {
@@ -137,16 +153,30 @@ export const createBlocksStore = (initialBlocks: BlockData[] = []) => {
       );
     },
 
+    updateBlockContent: ({ id, content }) => {
+      set((state) =>
+        R.mergeDeepRight(state, {
+          data: {
+            contents: {
+              [id]: content,
+            },
+          },
+        })
+      );
+    },
+
     deleteBlock: (id) => {
       set((state) => {
         const newIds = state.data.ids.filter((blockId) => blockId !== id);
         const newEntities = R.omit([id], state.data.entities);
+        const newContents = R.omit([id], state.data.contents);
 
         return {
           ...state,
           data: {
             ids: newIds,
             entities: newEntities,
+            contents: newContents,
           },
         };
       });
