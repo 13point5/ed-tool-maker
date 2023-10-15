@@ -44,6 +44,11 @@ import { Database } from "@/app/database.types";
 import { StoreApi, useStore } from "zustand";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import toast from "react-hot-toast";
+import editorConfig from "@/lib/tiptapConfig";
+import { EditorContent, useEditor } from "@tiptap/react";
+
+import suggestion from "@/components/at-mention";
+import { Mention } from "@/components/at-mention/Renderer";
 
 type Props = {
   data: Database["public"]["Tables"]["tools"]["Row"];
@@ -74,6 +79,26 @@ enum FormStatus {
   Success,
 }
 
+export const formatHTMLWithMentions = (html: string) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const spans = doc.getElementsByTagName("span");
+
+  for (let i = spans.length - 1; i >= 0; i--) {
+    const span = spans[i];
+    const dataType = span.getAttribute("data-type");
+    const dataId = span.getAttribute("data-id");
+
+    if (dataType === "mention" && dataId) {
+      const blockId = `<@block:${dataId}>`;
+      const newElement = doc.createTextNode(blockId);
+      span.parentNode?.replaceChild(newElement, span);
+    }
+  }
+
+  return doc.body.innerHTML.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+};
+
 function Builder({ data }: Props) {
   const supabase = createClientComponentClient<Database>();
 
@@ -97,15 +122,27 @@ function Builder({ data }: Props) {
   );
   console.log("settings", settings);
 
-  const handleInstructionsChange: React.ChangeEventHandler<
-    HTMLTextAreaElement
-  > = (e) => {
-    setSettings((prev) =>
-      R.mergeDeepRight(prev, {
-        instructions: e.target.value,
-      })
-    );
-  };
+  const instructionsEditor = useEditor({
+    ...editorConfig,
+    extensions: [
+      ...editorConfig.extensions,
+
+      Mention.configure({
+        HTMLAttributes: {
+          class: "p-1 rounded-sm bg-blue-300",
+        },
+        suggestion: {
+          render: suggestion.render,
+          items: ({ query = "" }) => {
+            return Object.values(blocks.entities).filter((block) =>
+              block.label.toLowerCase().includes(query.toLowerCase())
+            );
+          },
+        },
+      }),
+    ],
+    content: settings.instructions,
+  });
 
   const handleModelChange = (value: string) => {
     setSettings((prev) =>
@@ -160,7 +197,10 @@ function Builder({ data }: Props) {
       id: data.id,
       name,
       description,
-      settings,
+      settings: {
+        ...settings,
+        instructions: instructionsEditor?.getHTML() || settings.instructions,
+      },
       data: {
         blocks: Object.values(blocks.entities),
       },
@@ -235,7 +275,7 @@ function Builder({ data }: Props) {
           <Button className="w-full bg-blue-500 hover:bg-blue-700">Test</Button>
         </div>
 
-        <div className="flex flex-col gap-4 p-4 min-w-[400px]">
+        <div className="flex flex-col gap-4 p-4 w-[400px]">
           <h4 className="text-lg font-semibold">Tool Design</h4>
 
           <div className="space-y-2">
@@ -251,9 +291,19 @@ function Builder({ data }: Props) {
           <div className="space-y-2">
             <Label>Instructions</Label>
 
-            <Textarea
+            {/* <Textarea
               value={settings.instructions}
               onChange={handleInstructionsChange}
+            /> */}
+
+            <EditorContent
+              editor={instructionsEditor}
+              className="border border-input rounded-md p-2 bg-white"
+              style={{
+                width: "100%",
+                maxWidth: "100%",
+                minHeight: "100px",
+              }}
             />
           </div>
 
