@@ -127,9 +127,16 @@ const Tool = ({ data }: Props) => {
       });
     } catch (error) {
       console.error(error);
-      toast.error("Something went wrong", {
-        position: "bottom-right",
-      });
+
+      if (!localStorage.getItem(openAiApiKeyStorageKey)) {
+        toast.error("Please add your OpenAI API key in the user menu", {
+          position: "bottom-center",
+        });
+      } else {
+        toast.error("Something went wrong", {
+          position: "bottom-right",
+        });
+      }
     } finally {
       setGenerating(false);
     }

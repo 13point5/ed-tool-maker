@@ -10,6 +10,7 @@ import { Loader2Icon, SendIcon } from "lucide-react";
 import { useChat } from "ai/react";
 import { openAiApiKeyStorageKey } from "@/lib/constants";
 import { nanoid } from "nanoid";
+import toast from "react-hot-toast";
 
 type Props = {
   data: Database["public"]["Tables"]["tools"]["Row"];
@@ -40,7 +41,30 @@ const Chatbot = ({ data }: Props) => {
             },
           ]
         : [],
+      onError: (error) => {
+        if (!localStorage.getItem(openAiApiKeyStorageKey)) {
+          toast.error("Please add your OpenAI API key in the user menu", {
+            position: "bottom-center",
+          });
+        } else {
+          toast.error(error.message, {
+            position: "bottom-center",
+          });
+        }
+      },
     });
+
+  const handleChat: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+
+    if (!localStorage.getItem(openAiApiKeyStorageKey)) {
+      toast.error("Please add your OpenAI API key in the user menu", {
+        position: "bottom-center",
+      });
+      return;
+    }
+    handleSubmit(e);
+  };
 
   return (
     <div className="mx-auto p-4 pt-16 pb-8 flex flex-col items-center gap-6 static h-screen max-h-screen">
@@ -75,7 +99,7 @@ const Chatbot = ({ data }: Props) => {
           )}
         </div>
 
-        <form className="flex gap-4" onSubmit={handleSubmit}>
+        <form className="flex gap-4" onSubmit={handleChat}>
           <Input
             placeholder="type your message here"
             value={input}

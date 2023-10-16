@@ -280,6 +280,16 @@ function Builder({ data }: Props) {
 
       if (!res.ok) {
         console.error(res.statusText);
+
+        if (!localStorage.getItem(openAiApiKeyStorageKey)) {
+          toast.error("Please add your OpenAI API key in the user menu", {
+            position: "bottom-center",
+          });
+          return;
+        }
+
+        toast.error("Something went wrong");
+
         return;
       }
 
