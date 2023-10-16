@@ -59,6 +59,7 @@ import {
   updateMentionLabel,
 } from "@/lib/utils";
 import Markdown from "react-markdown";
+import { Slider } from "@/components/ui/slider";
 
 type Props = {
   data: Database["public"]["Tables"]["tools"]["Row"];
@@ -80,6 +81,13 @@ export default BuilderBla;
 type ToolSettings = {
   instructions: string;
   model: string;
+  temperature: number;
+};
+
+const defaultSettings: ToolSettings = {
+  instructions: "",
+  model: "gpt-3.5-turbo",
+  temperature: 1,
 };
 
 enum FormStatus {
@@ -116,10 +124,7 @@ function Builder({ data }: Props) {
   };
 
   const [settings, setSettings] = useState<ToolSettings>(
-    (data.settings as ToolSettings) || {
-      instructions: "",
-      model: "gpt-3.5-turbo",
-    }
+    R.mergeDeepRight(defaultSettings, (data.settings as ToolSettings) || {})
   );
 
   const instructionsEditor = useEditor({
@@ -168,6 +173,14 @@ function Builder({ data }: Props) {
     setSettings((prev) =>
       R.mergeDeepRight(prev, {
         model: value,
+      })
+    );
+  };
+
+  const handleTemperatureChange = (values: number[]) => {
+    setSettings((prev) =>
+      R.mergeDeepRight(prev, {
+        temperature: values[0],
       })
     );
   };
@@ -257,6 +270,7 @@ function Builder({ data }: Props) {
           prompt,
           model: settings.model,
           apiKey: localStorage.getItem(openAiApiKeyStorageKey),
+          temperature: settings.temperature,
         }),
       });
 
@@ -424,6 +438,17 @@ function Builder({ data }: Props) {
                 <SelectItem value="gpt-4">GPT 4</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Temperature: {settings.temperature}</Label>
+            <Slider
+              value={[settings.temperature]}
+              onValueChange={handleTemperatureChange}
+              max={2}
+              min={0}
+              step={0.1}
+            />
           </div>
 
           <Button

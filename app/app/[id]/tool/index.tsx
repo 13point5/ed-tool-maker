@@ -81,6 +81,8 @@ const Tool = ({ data }: Props) => {
         // @ts-ignore
         model: data.settings?.model || "gpt-3.5-turbo",
         apiKey: localStorage.getItem(openAiApiKeyStorageKey),
+        // @ts-ignore
+        temperature: data.settings?.temperature || 1,
       }),
     });
 
