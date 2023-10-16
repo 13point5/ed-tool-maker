@@ -23,7 +23,7 @@ export default function Header({ toolData }: Props) {
             <h3 className="text-lg font-semibold">{toolData.name}</h3>
 
             <Link
-              href={`/tool/${toolData.id}`}
+              href={`/app/${toolData.id}`}
               target="_blank"
               rel="noopener noreferrer"
             >

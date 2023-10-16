@@ -14,7 +14,7 @@ import { openAiApiKeyStorageKey } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
 import toast from "react-hot-toast";
 import { CopyIcon, KeyRoundIcon, Loader2Icon, MenuIcon } from "lucide-react";
-import { MenuButton } from "@/app/tool/[id]/menu-button";
+import { MenuButton } from "@/app/app/[id]/tool/menu-button";
 import Markdown from "react-markdown";
 
 type ValuesByIdState = BlocksState["data"]["contents"];

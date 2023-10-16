@@ -36,8 +36,6 @@ enum FormStatus {
 }
 
 const ChatbotBuilder = ({ data }: Props) => {
-  console.log("data", data);
-
   const supabase = createClientComponentClient<Database>();
 
   const [name, setName] = useState(data.name || "");
