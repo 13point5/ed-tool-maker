@@ -5,11 +5,15 @@ import { Button } from "@/components/ui/button";
 import { BlockData, BlockType, BlocksState } from "@/lib/blocksStore";
 import { Block } from "./block";
 import { useState } from "react";
-import { formatHTMLWithContent, restoreHTMLFromMentions } from "@/lib/utils";
+import {
+  copyTextToClipboard,
+  formatHTMLWithContent,
+  restoreHTMLFromMentions,
+} from "@/lib/utils";
 import { openAiApiKeyStorageKey } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
 import toast from "react-hot-toast";
-import { KeyRoundIcon, Loader2Icon, MenuIcon } from "lucide-react";
+import { CopyIcon, KeyRoundIcon, Loader2Icon, MenuIcon } from "lucide-react";
 import { MenuButton } from "@/app/tool/[id]/menu-button";
 import Markdown from "react-markdown";
 
@@ -160,7 +164,17 @@ const Tool = ({ data }: Props) => {
         <>
           <Separator />
           <div className="flex flex-col gap-2">
-            <h2 className="text-xl font-semibold">Output</h2>
+            <div className="flex gap-2 items-center">
+              <h2 className="text-xl font-semibold">Output</h2>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => copyTextToClipboard(response)}
+              >
+                <CopyIcon className="w-4 h-4 mr-2" /> Copy
+              </Button>
+            </div>
 
             <Markdown className="prose my-6 w-full">{response}</Markdown>
           </div>
