@@ -1,3 +1,4 @@
+import ChatbotBuilder from "@/app/tool-builder/[id]/chatbot-builder";
 import Builder from "./builder";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
@@ -36,6 +37,8 @@ const ToolBuilderPage = async ({ params }: Props) => {
       </p>
     );
   }
+
+  if (res.data.type === "chatbot") return <ChatbotBuilder data={res.data} />;
 
   return <Builder data={res.data} />;
 };

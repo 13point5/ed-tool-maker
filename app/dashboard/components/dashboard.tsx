@@ -16,7 +16,7 @@ export default function Dashboard({ tools }: Props) {
 
       <div className="space-y-4 p-4">
         <div className="flex gap-4 items-center">
-          <h2 className="text-xl font-bold">Tools</h2>
+          <h2 className="text-xl font-bold">Apps</h2>
 
           <CreateToolButton type="tool" />
           <CreateToolButton type="chatbot" />
