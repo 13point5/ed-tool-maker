@@ -15,7 +15,11 @@ const DashboardPage = async () => {
     redirect("/");
   }
 
-  const data = await supabase.from("tools").select("*");
+  // where created_by = user.id
+  const data = await supabase
+    .from("tools")
+    .select("*")
+    .filter("created_by", "eq", user.id);
 
   return <Dashboard tools={data.data || []} />;
 };
