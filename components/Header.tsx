@@ -22,9 +22,11 @@ export default function Header({ toolData }: Props) {
 
             <h3 className="text-lg font-semibold">{toolData.name}</h3>
 
-            <Button size="sm" variant="outline" className="">
-              <ExternalLinkIcon className="w-4 h-4 mr-1" /> Preview
-            </Button>
+            <Link href={`/tool/${toolData.id}`}>
+              <Button size="sm" variant="outline" className="">
+                <ExternalLinkIcon className="w-4 h-4 mr-1" /> Preview
+              </Button>
+            </Link>
           </>
         )}
       </div>

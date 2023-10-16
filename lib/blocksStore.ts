@@ -52,7 +52,6 @@ const getBlockIndexById = (blocks: BlockData["id"][], id: string) => {
 };
 
 export const createBlocksStore = (initialBlocks: BlockData[] = []) => {
-  console.log("initialBlocks", initialBlocks);
   const initialState: BlocksData = {
     ids: [],
     entities: {},
