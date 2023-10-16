@@ -16,8 +16,12 @@ const Home = async () => {
   }
 
   return (
-    <main className="w-screen p-4 flex flex-col gap-4 items-center">
-      <h1 className="text-4xl font-bold">ATM</h1>
+    <main className="w-screen p-8 flex flex-col gap-4 items-center">
+      <h1 className="text-4xl font-bold">AI Tool Maker</h1>
+
+      <p className="text-center text-md text-muted-foreground">
+        Create AI tools and chatbots without writing code.
+      </p>
 
       <div className="space-x-4">
         <Button>
@@ -28,6 +32,18 @@ const Home = async () => {
           <Button>Sign Up</Button>
         </Link>
       </div>
+
+      <p className="my-4">
+        Made with 🪄 by{" "}
+        <a
+          href="https://bharathsrr.com"
+          className="underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Sriraam
+        </a>
+      </p>
     </main>
   );
 };
