@@ -26,7 +26,15 @@ const ToolBuilderPage = async ({ params }: Props) => {
   const res = await supabase.from("tools").select("*").eq("id", id).single();
 
   if (res.error || !res.data) {
-    return <p className="text-red-500">Could not find tool</p>;
+    return <p className="text-red-500 text-center p-8">Could not find tool</p>;
+  }
+
+  if (res.data.created_by !== user.id) {
+    return (
+      <p className="text-red-500 text-center p-8">
+        You do not have permission to edit this tool
+      </p>
+    );
   }
 
   return <Builder data={res.data} />;
