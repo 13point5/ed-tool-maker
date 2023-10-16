@@ -275,7 +275,7 @@ function Builder({ data }: Props) {
       <Header toolData={data} />
 
       <div className="grow flex gap-0">
-        <div className="grow flex flex-col gap-8 items-center border-r-2 p-4">
+        <div className="w-full flex flex-col gap-8 items-center border-r-2 p-4">
           {blocks.ids.length === 0 && (
             <div className="flex gap-4 items-center">
               <Button
