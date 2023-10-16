@@ -9,7 +9,8 @@ import { formatHTMLWithContent, restoreHTMLFromMentions } from "@/lib/utils";
 import { openAiApiKeyStorageKey } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
 import toast from "react-hot-toast";
-import { Loader2Icon } from "lucide-react";
+import { KeyRoundIcon, Loader2Icon, MenuIcon } from "lucide-react";
+import { MenuButton } from "@/app/tool/[id]/menu-button";
 
 type ValuesByIdState = BlocksState["data"]["contents"];
 
@@ -124,13 +125,15 @@ const Tool = ({ data }: Props) => {
   };
 
   return (
-    <div className="mx-auto p-4 max-w-md flex flex-col gap-6">
+    <div className="mx-auto p-4 py-8 max-w-xl flex flex-col gap-6 static">
       <div className="flex flex-col gap-2">
         <h1 className="text-center text-2xl font-bold">{data.name}</h1>
         <p className="text-center text-md text-muted-foreground">
           {data.description}
         </p>
       </div>
+
+      <MenuButton />
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         {blocks.map((block) => (
