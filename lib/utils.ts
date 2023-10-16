@@ -102,3 +102,11 @@ export const deleteMention = (html: string, id: string) => {
 
   return doc.body.innerHTML;
 };
+
+export async function copyTextToClipboard(text: string) {
+  if ("clipboard" in navigator) {
+    return await navigator.clipboard.writeText(text);
+  } else {
+    return document.execCommand("copy", true, text);
+  }
+}

@@ -29,7 +29,6 @@ export const UserMenu = () => {
     e
   ) => {
     e.preventDefault();
-    console.log("sign out");
 
     try {
       const res = await supabase.auth.signOut();

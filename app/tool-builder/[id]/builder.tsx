@@ -39,7 +39,7 @@ import {
 } from "@/components/ui/select";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
-import { Loader2Icon, PlusIcon, SaveIcon } from "lucide-react";
+import { CopyIcon, Loader2Icon, PlusIcon, SaveIcon } from "lucide-react";
 import { Database } from "@/app/database.types";
 import { StoreApi, useStore } from "zustand";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
@@ -51,12 +51,14 @@ import suggestion from "@/components/at-mention";
 import { Mention } from "@/components/at-mention/Renderer";
 import { mentionRendererClass, openAiApiKeyStorageKey } from "@/lib/constants";
 import {
+  copyTextToClipboard,
   deleteMention,
   formatHTMLWithContent,
   formatHTMLWithMentions,
   restoreHTMLFromMentions,
   updateMentionLabel,
 } from "@/lib/utils";
+import Markdown from "react-markdown";
 
 type Props = {
   data: Database["public"]["Tables"]["tools"]["Row"];
@@ -99,7 +101,6 @@ function Builder({ data }: Props) {
     moveBlock,
     addFirstBlock,
   } = useStore(store);
-  console.log("blocks", blocks);
 
   const [name, setName] = useState(data.name || "");
   const handleNameChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -151,8 +152,6 @@ function Builder({ data }: Props) {
   };
 
   const onBlockDelete = (id: string) => {
-    console.log("on delete", id);
-
     if (!instructionsEditor) return;
 
     const html = instructionsEditor.getHTML();
@@ -229,47 +228,61 @@ function Builder({ data }: Props) {
     });
   };
 
+  const [generating, setGenerating] = useState(false);
   const [response, setResponse] = useState("");
+  console.log("response", response);
 
   const generateResponse = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
+    setGenerating(true);
     setResponse("");
 
     const rawInstructions =
       instructionsEditor?.getHTML() || settings.instructions;
     const prompt = formatHTMLWithContent(rawInstructions, blocks.contents);
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        prompt,
-        apiKey: localStorage.getItem(openAiApiKeyStorageKey),
-      }),
-    });
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt,
+          model: settings.model,
+          apiKey: localStorage.getItem(openAiApiKeyStorageKey),
+        }),
+      });
 
-    if (!res.ok) {
-      throw new Error(res.statusText);
-    }
+      if (!res.ok) {
+        console.error(res.statusText);
+        return;
+      }
 
-    // This data is a ReadableStream
-    const data = res.body;
-    if (!data) {
-      return;
-    }
+      // This data is a ReadableStream
+      const data = res.body;
+      if (!data) {
+        return;
+      }
 
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
+      const reader = data.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
 
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value);
-      setResponse((prev) => prev + chunkValue);
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        const chunkValue = decoder.decode(value);
+        setResponse((prev) => prev + chunkValue);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error generating response", {
+        position: "bottom-center",
+      });
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -278,7 +291,7 @@ function Builder({ data }: Props) {
       <Header toolData={data} />
 
       <div className="grow flex gap-0">
-        <div className="w-full flex flex-col gap-8 items-center border-r-2 p-4">
+        <div className="w-full flex flex-col gap-8 border-r-2 p-4">
           {blocks.ids.length === 0 && (
             <div className="flex gap-4 items-center">
               <Button
@@ -337,11 +350,31 @@ function Builder({ data }: Props) {
             onClick={generateResponse}
             className="w-full bg-blue-500 hover:bg-blue-700"
           >
-            Test
+            {generating ? (
+              <>
+                <Loader2Icon className="animate-spin mr-2" /> Generating
+              </>
+            ) : (
+              "Generate"
+            )}
           </Button>
 
           {response && (
-            <div className="whitespace-pre-wrap my-6 w-full">{response}</div>
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-2 items-center">
+                <h4 className="text-xl font-semibold">Output</h4>
+
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyTextToClipboard(response)}
+                >
+                  <CopyIcon className="w-4 h-4 mr-2" /> Copy
+                </Button>
+              </div>
+
+              <Markdown className="prose my-6 w-full">{response}</Markdown>
+            </div>
           )}
         </div>
 
@@ -380,6 +413,9 @@ function Builder({ data }: Props) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="gpt-3.5-turbo">GPT 3.5</SelectItem>
+                <SelectItem value="gpt-3.5-turbo-16k">
+                  GPT 3.5 16K Context
+                </SelectItem>
                 <SelectItem value="gpt-4">GPT 4</SelectItem>
               </SelectContent>
             </Select>

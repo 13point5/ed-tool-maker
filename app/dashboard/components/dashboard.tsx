@@ -10,8 +10,6 @@ type Props = {
 };
 
 export default function Dashboard({ tools }: Props) {
-  console.log("tools", tools);
-
   return (
     <main className="w-screen min-h-screen flex flex-col">
       <Header />

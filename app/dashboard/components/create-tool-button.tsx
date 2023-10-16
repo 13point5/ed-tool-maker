@@ -63,8 +63,6 @@ export const CreateToolButton = () => {
   const [formStatus, setFormStatus] = useState<FormStatus>(FormStatus.Idle);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("values", values);
-
     setFormStatus(FormStatus.Loading);
 
     const res = await supabase
@@ -74,8 +72,6 @@ export const CreateToolButton = () => {
         description: values.description,
       })
       .select();
-
-    console.log("res", res);
 
     const toolId = res.data?.[0]?.id;
 

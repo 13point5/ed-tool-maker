@@ -41,8 +41,6 @@ type Props = {
 };
 
 const Tool = ({ data }: Props) => {
-  console.log("data", data);
-
   // @ts-ignore
   const blocks: BlockData[] = data.data?.blocks || [];
 
@@ -75,6 +73,8 @@ const Tool = ({ data }: Props) => {
       },
       body: JSON.stringify({
         prompt,
+        // @ts-ignore
+        model: data.settings?.model || "gpt-3.5-turbo",
         apiKey: localStorage.getItem(openAiApiKeyStorageKey),
       }),
     });
@@ -84,12 +84,12 @@ const Tool = ({ data }: Props) => {
     }
 
     // This data is a ReadableStream
-    const data = res.body;
-    if (!data) {
+    const body = res.body;
+    if (!body) {
       return;
     }
 
-    const reader = data.getReader();
+    const reader = body.getReader();
     const decoder = new TextDecoder();
     let done = false;
 

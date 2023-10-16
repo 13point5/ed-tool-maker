@@ -5,7 +5,7 @@ import { OpenAIStream, StreamingTextResponse } from "ai";
 export const runtime = "edge";
 
 export async function POST(req: Request) {
-  const { prompt, apiKey } = await req.json();
+  const { prompt, model, apiKey } = await req.json();
 
   const openai = new OpenAI({
     apiKey,
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
   // Ask OpenAI for a streaming completion given the prompt
   const response = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo",
+    model,
     stream: true,
     messages: [
       {

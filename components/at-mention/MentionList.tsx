@@ -60,7 +60,6 @@ const MentionList = forwardRef((props, ref) => {
       return false;
     },
   }));
-  console.log("props.items", props.items);
 
   return (
     <div

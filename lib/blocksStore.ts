@@ -85,7 +85,6 @@ export const createBlocksStore = (initialBlocks: BlockData[] = []) => {
           type: blockType,
           label: "Untitled",
         };
-        console.log("newBlockData", newBlockData);
 
         return R.mergeDeepRight(state, {
           data: {

@@ -72,7 +72,6 @@ const suggestion = {
       },
 
       onExit() {
-        console.log("popup", popup);
         popup?.[0]?.destroy();
         component?.destroy();
       },

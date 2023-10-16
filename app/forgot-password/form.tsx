@@ -56,7 +56,6 @@ const ForgotPasswordForm = () => {
   const [formStatus, setFormStatus] = useState<FormStatus>(FormStatus.Idle);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("values", values);
     setFormStatus(FormStatus.Loading);
 
     const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
