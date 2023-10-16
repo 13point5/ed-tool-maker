@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -13,7 +12,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,15 +22,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Database } from "@/app/database.types";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { getProjectTypeLabel } from "@/lib/constants";
 
 const formSchema = z.object({
   name: z.string(),
-  description: z.string(),
 });
 
 enum FormStatus {
@@ -42,11 +39,12 @@ enum FormStatus {
   Success,
 }
 
-export const CreateToolButton = () => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+type Props = {
+  type: string;
+};
 
-  const openDialog = () => setIsDialogOpen(true);
-  const closeDialog = () => setIsDialogOpen(false);
+export const CreateToolButton = ({ type }: Props) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const router = useRouter();
 
@@ -56,20 +54,20 @@ export const CreateToolButton = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      description: "",
     },
   });
 
   const [formStatus, setFormStatus] = useState<FormStatus>(FormStatus.Idle);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log("sup");
     setFormStatus(FormStatus.Loading);
 
     const res = await supabase
       .from("tools")
       .insert({
         name: values.name,
-        description: values.description,
+        type,
       })
       .select();
 
@@ -91,13 +89,14 @@ export const CreateToolButton = () => {
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <Button size="sm" className="bg-blue-500 hover:bg-blue-700">
-          <PlusIcon className="mr-1 w-5 h-5" /> Create Tool
+          <PlusIcon className="mr-1 w-5 h-5" /> Create{" "}
+          {getProjectTypeLabel(type)}
         </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>New Tool</DialogTitle>
+          <DialogTitle>New {getProjectTypeLabel(type)}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -116,32 +115,18 @@ export const CreateToolButton = () => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+            {/* <DialogFooter> */}
+            <Button type="submit">
+              {formStatus === FormStatus.Loading && (
+                <>
+                  <Loader2Icon className="animate-spin mr-2" />
+                  Creating
+                </>
               )}
-            />
 
-            <DialogFooter>
-              <Button type="submit">
-                {formStatus === FormStatus.Loading && (
-                  <>
-                    <Loader2Icon className="animate-spin mr-2" />
-                    Creating
-                  </>
-                )}
-
-                {formStatus !== FormStatus.Loading && "Create"}
-              </Button>
-            </DialogFooter>
+              {formStatus !== FormStatus.Loading && "Create"}
+            </Button>
+            {/* </DialogFooter> */}
           </form>
         </Form>
       </DialogContent>

@@ -18,7 +18,8 @@ export default function Dashboard({ tools }: Props) {
         <div className="flex gap-4 items-center">
           <h2 className="text-xl font-bold">Tools</h2>
 
-          <CreateToolButton />
+          <CreateToolButton type="tool" />
+          <CreateToolButton type="chatbot" />
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -28,6 +29,7 @@ export default function Dashboard({ tools }: Props) {
               id={tool.id}
               name={tool.name}
               description={tool.description}
+              type={tool.type}
             />
           ))}
         </div>
