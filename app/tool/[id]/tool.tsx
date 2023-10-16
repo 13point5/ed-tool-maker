@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import toast from "react-hot-toast";
 import { KeyRoundIcon, Loader2Icon, MenuIcon } from "lucide-react";
 import { MenuButton } from "@/app/tool/[id]/menu-button";
+import Markdown from "react-markdown";
 
 type ValuesByIdState = BlocksState["data"]["contents"];
 
@@ -161,7 +162,7 @@ const Tool = ({ data }: Props) => {
           <div className="flex flex-col gap-2">
             <h2 className="text-xl font-semibold">Output</h2>
 
-            <div className="whitespace-pre-wrap my-6 w-full">{response}</div>
+            <Markdown className="prose my-6 w-full">{response}</Markdown>
           </div>
         </>
       )}
