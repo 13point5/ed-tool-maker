@@ -1,5 +1,9 @@
 import { IconOpenAI } from "@/components/icons";
 import { MemoizedReactMarkdown } from "@/components/markdown";
+import remarkGfm from "remark-gfm";
+import rehypeKatex from "rehype-katex";
+import remarkMath from "remark-math";
+import "katex/dist/katex.min.css";
 import { cn } from "@/lib/utils";
 import { UserIcon } from "lucide-react";
 
@@ -24,6 +28,8 @@ export const ChatMessage = ({ role, content }: Props) => {
       </div>
       <div className="flex-1 px-1 ml-4 space-y-2 overflow-hidden">
         <MemoizedReactMarkdown
+          remarkPlugins={[remarkGfm, remarkMath]}
+          rehypePlugins={[rehypeKatex]}
           className="prose break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"
           components={{
             p({ children }) {

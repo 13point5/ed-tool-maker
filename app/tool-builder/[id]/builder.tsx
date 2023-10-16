@@ -58,8 +58,12 @@ import {
   restoreHTMLFromMentions,
   updateMentionLabel,
 } from "@/lib/utils";
-import Markdown from "react-markdown";
+import { MemoizedReactMarkdown } from "@/components/markdown";
+import remarkGfm from "remark-gfm";
 import { Slider } from "@/components/ui/slider";
+import rehypeKatex from "rehype-katex";
+import remarkMath from "remark-math";
+import "katex/dist/katex.min.css";
 
 type Props = {
   data: Database["public"]["Tables"]["tools"]["Row"];
@@ -392,7 +396,13 @@ function Builder({ data }: Props) {
                 </Button>
               </div>
 
-              <Markdown className="prose my-6 w-full">{response}</Markdown>
+              <MemoizedReactMarkdown
+                remarkPlugins={[remarkGfm, remarkMath]}
+                rehypePlugins={[rehypeKatex]}
+                className="prose my-6 w-full"
+              >
+                {response}
+              </MemoizedReactMarkdown>
             </div>
           )}
         </div>

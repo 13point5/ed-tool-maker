@@ -15,7 +15,11 @@ import { Separator } from "@/components/ui/separator";
 import toast from "react-hot-toast";
 import { CopyIcon, KeyRoundIcon, Loader2Icon, MenuIcon } from "lucide-react";
 import { MenuButton } from "@/app/app/[id]/tool/menu-button";
-import Markdown from "react-markdown";
+import { MemoizedReactMarkdown } from "@/components/markdown";
+import remarkGfm from "remark-gfm";
+import rehypeKatex from "rehype-katex";
+import remarkMath from "remark-math";
+import "katex/dist/katex.min.css";
 
 type ValuesByIdState = BlocksState["data"]["contents"];
 
@@ -178,7 +182,13 @@ const Tool = ({ data }: Props) => {
               </Button>
             </div>
 
-            <Markdown className="prose my-6 w-full">{response}</Markdown>
+            <MemoizedReactMarkdown
+              className="prose my-6 w-full"
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeKatex]}
+            >
+              {response}
+            </MemoizedReactMarkdown>
           </div>
         </>
       )}
