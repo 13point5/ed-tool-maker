@@ -125,7 +125,7 @@ const Tool = ({ data }: Props) => {
   };
 
   return (
-    <div className="mx-auto p-4 py-8 max-w-xl flex flex-col gap-6 static">
+    <div className="mx-auto p-4 py-16 max-w-xl flex flex-col gap-6 static">
       <div className="flex flex-col gap-2">
         <h1 className="text-center text-2xl font-bold">{data.name}</h1>
         <p className="text-center text-md text-muted-foreground">
