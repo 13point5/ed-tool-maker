@@ -71,7 +71,7 @@ const Tool = ({ data }: Props) => {
   const generateResponse = async (prompt: string) => {
     setResponse("");
 
-    const res = await fetch("/api/chat", {
+    const res = await fetch("/api/completion", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

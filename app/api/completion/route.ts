@@ -5,7 +5,7 @@ import { OpenAIStream, StreamingTextResponse } from "ai";
 export const runtime = "edge";
 
 export async function POST(req: Request) {
-  const { messages, model, apiKey } = await req.json();
+  const { prompt, model, apiKey } = await req.json();
 
   const openai = new OpenAI({
     apiKey,
@@ -15,7 +15,12 @@ export async function POST(req: Request) {
   const response = await openai.chat.completions.create({
     model,
     stream: true,
-    messages,
+    messages: [
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
   });
   // Convert the response into a friendly text-stream
   const stream = OpenAIStream(response);

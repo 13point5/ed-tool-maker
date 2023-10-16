@@ -248,7 +248,7 @@ function Builder({ data }: Props) {
     const prompt = formatHTMLWithContent(rawInstructions, blocks.contents);
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch("/api/completion", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
