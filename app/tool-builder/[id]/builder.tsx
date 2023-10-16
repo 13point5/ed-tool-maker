@@ -101,6 +101,7 @@ function Builder({ data }: Props) {
     moveBlock,
     addFirstBlock,
   } = useStore(store);
+  console.log("blocks", blocks);
 
   const [name, setName] = useState(data.name || "");
   const handleNameChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -133,9 +134,13 @@ function Builder({ data }: Props) {
         suggestion: {
           render: suggestion.render,
           items: ({ query = "" }) => {
-            return Object.values(blocks.entities).filter((block) =>
-              block.label.toLowerCase().includes(query.toLowerCase())
-            );
+            const state = store.getState();
+            return Object.values(state.data.entities).filter((block) => {
+              const res = block.label
+                .toLowerCase()
+                .includes(query.toLowerCase());
+              return res;
+            });
           },
         },
       }),
