@@ -217,6 +217,9 @@ function Builder({ data }: Props) {
     if (error) {
       console.error(error);
       setSaveStatus(FormStatus.Error);
+      toast.error("Error saving tool", {
+        position: "bottom-center",
+      });
       return;
     }
 
