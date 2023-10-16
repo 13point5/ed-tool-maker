@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon, SaveIcon } from "lucide-react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import toast from "react-hot-toast";
+import { Slider } from "@/components/ui/slider";
 
 type Props = {
   data: Database["public"]["Tables"]["tools"]["Row"];
@@ -26,6 +27,13 @@ type Props = {
 type ToolSettings = {
   instructions: string;
   model: string;
+  temperature: number;
+};
+
+const defaultSettings: ToolSettings = {
+  instructions: "",
+  model: "gpt-3.5-turbo",
+  temperature: 1,
 };
 
 enum FormStatus {
@@ -51,10 +59,7 @@ const ChatbotBuilder = ({ data }: Props) => {
   };
 
   const [settings, setSettings] = useState<ToolSettings>(
-    (data.settings as ToolSettings) || {
-      instructions: "",
-      model: "gpt-3.5-turbo",
-    }
+    R.mergeDeepRight(defaultSettings, (data.settings as ToolSettings) || {})
   );
 
   const handleInstructionsChange: React.ChangeEventHandler<
@@ -71,6 +76,14 @@ const ChatbotBuilder = ({ data }: Props) => {
     setSettings((prev) =>
       R.mergeDeepRight(prev, {
         model: value,
+      })
+    );
+  };
+
+  const handleTemperatureChange = (values: number[]) => {
+    setSettings((prev) =>
+      R.mergeDeepRight(prev, {
+        temperature: values[0],
       })
     );
   };
@@ -130,6 +143,17 @@ const ChatbotBuilder = ({ data }: Props) => {
               <SelectItem value="gpt-4">GPT 4</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Temperature: {settings.temperature}</Label>
+          <Slider
+            value={[settings.temperature]}
+            onValueChange={handleTemperatureChange}
+            max={2}
+            min={0}
+            step={0.1}
+          />
         </div>
 
         <div className="space-y-2">
