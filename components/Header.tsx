@@ -22,7 +22,11 @@ export default function Header({ toolData }: Props) {
 
             <h3 className="text-lg font-semibold">{toolData.name}</h3>
 
-            <Link href={`/tool/${toolData.id}`}>
+            <Link
+              href={`/tool/${toolData.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Button size="sm" variant="outline" className="">
                 <ExternalLinkIcon className="w-4 h-4 mr-1" /> Preview
               </Button>
