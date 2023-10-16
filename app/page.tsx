@@ -17,7 +17,7 @@ const Home = async () => {
 
   return (
     <main className="w-screen p-4 flex flex-col gap-4 items-center">
-      <h1 className="text-4xl font-bold">ETM</h1>
+      <h1 className="text-4xl font-bold">ATM</h1>
 
       <div className="space-x-4">
         <Button>

@@ -80,7 +80,7 @@ const ForgotPasswordForm = () => {
 
   return (
     <main className="flex flex-col gap-6 items-center w-full h-screen pt-8 px-4">
-      <h1 className="text-4xl font-bold">ETM</h1>
+      <h1 className="text-4xl font-bold">ATM</h1>
       <Card className="max-w-sm w-full">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">Reset Password</CardTitle>

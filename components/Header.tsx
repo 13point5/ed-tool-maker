@@ -13,7 +13,7 @@ export default function Header({ toolData }: Props) {
     <div className="border-b-2 p-4 flex gap-4 items-center justify-between w-full h-fit">
       <div className="flex gap-4 items-center">
         <Link href="/">
-          <h2 className="text-xl font-bold">ETM</h2>
+          <h2 className="text-xl font-bold">ATM</h2>
         </Link>
 
         {toolData && (

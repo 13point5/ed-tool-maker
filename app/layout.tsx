@@ -9,7 +9,7 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Ed Tool Maker",
+  title: "AI Tool Maker",
 };
 
 // do not cache this layout
